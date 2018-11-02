@@ -1,62 +1,81 @@
 package net.coderobe.teb.demo.gui;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Image;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.WindowConstants;
+import javax.swing.JPanel;
 
 import net.coderobe.teb.demo.iface.Framebuffer;
 import net.coderobe.teb.demo.iface.Renderer;
 
 public class SwingRenderer implements Renderer {
 	private Framebuffer fb;
-	private BufferedImage view;
-	private Image view_img;
-	private boolean init = false;
-	private JFrame window = new JFrame();
-	private JLabel view_label;
-	private int zoom;
-	public SwingRenderer(Framebuffer f) {
-		this(f, 1);
+	private BufferedImage fbData;
+    private int zoom;
+
+    private JFrame window;
+	private JPanel viewPanel;
+
+	public SwingRenderer(Framebuffer fb) {
+		this(fb, 1);
 	}
-	public SwingRenderer(Framebuffer f, int z) {
-		fb = f;
-		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.setZoom(z);
+
+	public SwingRenderer(Framebuffer fb, int zoom) {
+	    if (fb == null) {
+	        throw new IllegalArgumentException("Framebuffer must not be null!");
+        }
+
+        this.fb = fb;
+        this.zoom = zoom;
+
+        fbData = new BufferedImage(fb.getWidth() * zoom, fb.getHeight() * zoom,
+                BufferedImage.TYPE_INT_RGB);
+
+        viewPanel = new JPanel(){
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(fbData, 0, 0, this);
+            }
+        };
+
+        viewPanel.setPreferredSize(new Dimension(fbData.getWidth(), fbData.getHeight()));
+        viewPanel.setSize(fbData.getWidth(), fbData.getHeight());
+
+        window = new JFrame();
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.getContentPane().setLayout(new FlowLayout());
+        window.getContentPane().add(viewPanel);
+        window.pack();
+        window.setVisible(true);
 	}
-	public void setZoom(int z) {
-		zoom = z;
-		view = new BufferedImage(fb.getWidth(), fb.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+    public int getZoom() {
+        return zoom;
+    }
+
+    public synchronized void setZoom(int zoom) {
+		this.zoom = zoom;
+		fbData = new BufferedImage(fb.getWidth() * zoom, fb.getHeight() * zoom,
+                BufferedImage.TYPE_INT_RGB);
 	}
-	private void replace() {
-		view_img = new ImageIcon(view).getImage().getScaledInstance(fb.getWidth()*zoom, fb.getHeight()*zoom, java.awt.Image.SCALE_REPLICATE);
-		view_label.setIcon(new ImageIcon(view_img));
-		window.getContentPane().add(view_label);
-	}
+
 	public JFrame getWindow() {
 		return window;
 	}
-	public void draw() {
-		if(!init) {
-			init = true;
-			window.getContentPane().setLayout(new FlowLayout());
-			view_label = new JLabel();
-			replace();
-			window.pack();
-			window.setVisible(true);
+
+	public synchronized void draw() {
+		for (int x = 0; x < fb.getWidth() * zoom; x++) {
+			for (int y = 0; y < fb.getHeight() * zoom; y++) {
+                fbData.setRGB(x, y, fb.getRGB(x / zoom, y / zoom));
+            }
 		}
-		for(int y = 0; y < fb.getHeight(); y++) {
-			for(int x = 0; x < fb.getWidth(); x++) {
-				view.setRGB(x, y, fb.getRGB(x, y)); // TODO: shaders
-			}
-		}
-		replace();
+
 		window.repaint();
 	}
+
 	public void close() {
 		window.dispose();
 	}
