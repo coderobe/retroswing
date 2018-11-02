@@ -23,10 +23,6 @@ public class SwingRenderer implements Renderer {
 	}
 
 	public SwingRenderer(Framebuffer fb, int zoom) {
-		if (fb == null) {
-			throw new IllegalArgumentException("Framebuffer must not be null!");
-		}
-
 		this.fb = fb;
 		this.zoom = zoom;
 
