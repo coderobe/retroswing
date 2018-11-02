@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import net.coderobe.teb.demo.cli.CLICleanupHook;
 import net.coderobe.teb.demo.cli.CLIInput;
 import net.coderobe.teb.demo.cli.CLIRenderer;
+import net.coderobe.teb.demo.cli.SixelRenderer;
 import net.coderobe.teb.demo.cli.shader.ANSIShader;
 import net.coderobe.teb.demo.cli.shader.BlockCharShader;
 import net.coderobe.teb.demo.cli.shader.BoolShader;
@@ -28,6 +29,7 @@ import net.coderobe.teb.demo.sprite.StringTexturedSprite;
 public class Main {
 	public static void main(String[] args) throws InterruptedException {
 		boolean cli = (args.length >= 1) ? new Scanner(args[0]).nextLine().equalsIgnoreCase("cli") : false;
+		boolean use_sixel = true;
 		int width;
 		int height;
 		if(cli) {
@@ -37,23 +39,34 @@ public class Main {
 			width = 42;
 			height = 42;
 		}
+
+		if(use_sixel && cli && args.length < 2) { // approximate accounting for sixel size
+			width *= 3.35;
+			height *= 3;
+		}
+
 		Framebuffer fb = new G2DFramebuffer(width, height);
 		Renderer r;
 		InputHandler in;
 		
 		if(cli) {
-			MultiShader c = new MultiShader();
-			c.add(new BoolShader());
-			c.add(new BlockCharShader());
-			//c.add(new HalfBlockShader()); // TODO
-			//c.add(new RandomCharShader());
-			c.add(new ANSIShader());
+			if(use_sixel) {
+				r = new SixelRenderer(fb, 1);
+			} else {
+				MultiShader c = new MultiShader();
+				c.add(new BoolShader());
+				c.add(new BlockCharShader());
+				//c.add(new HalfBlockShader()); // TODO
+				//c.add(new RandomCharShader());
+				c.add(new ANSIShader());
+
+				r = new CLIRenderer(fb, c);
+			}
+
+			in = new CLIInput();
 
 			Util.termRaw();
 			Runtime.getRuntime().addShutdownHook(new CLICleanupHook());
-
-			r = new CLIRenderer(fb, c);
-			in = new CLIInput();
 		} else {
 			r = new SwingRenderer(fb, 16);
 			in = new SwingInput(((SwingRenderer)r).getWindow());
