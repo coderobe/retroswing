@@ -9,6 +9,10 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// long opcode
+		put((byte) 0xCB, () -> {
+			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
+		});
 	}};
 	private final Map<Byte, Opcode> cb_opcodes = new HashMap<Byte, Opcode>(){{
 	}};
