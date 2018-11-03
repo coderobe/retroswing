@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Core {
-	private final Map<Byte, Opcode> opcodes = new HashMap<>(){{
+	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
 		// NOP
 		put((byte) 0x00, () -> {
 			// hurr
