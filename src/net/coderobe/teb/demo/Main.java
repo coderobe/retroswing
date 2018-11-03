@@ -9,11 +9,11 @@ import java.util.concurrent.TimeUnit;
 import net.coderobe.teb.demo.cli.CLICleanupHook;
 import net.coderobe.teb.demo.cli.CLIInput;
 import net.coderobe.teb.demo.cli.CLIRenderer;
+import net.coderobe.teb.demo.cli.HalfBlockRenderer;
 import net.coderobe.teb.demo.cli.SixelRenderer;
 import net.coderobe.teb.demo.cli.shader.ANSIShader;
 import net.coderobe.teb.demo.cli.shader.BlockCharShader;
 import net.coderobe.teb.demo.cli.shader.BoolShader;
-import net.coderobe.teb.demo.cli.shader.HalfBlockShader;
 import net.coderobe.teb.demo.cli.shader.MultiShader;
 import net.coderobe.teb.demo.cli.shader.RandomCharShader;
 import net.coderobe.teb.demo.gui.SwingInput;
@@ -29,7 +29,7 @@ import net.coderobe.teb.demo.sprite.StringTexturedSprite;
 public class Main {
 	public static void main(String[] args) throws InterruptedException {
 		boolean cli = (args.length >= 1) ? new Scanner(args[0]).nextLine().equalsIgnoreCase("cli") : false;
-		boolean use_sixel = true;
+		boolean use_sixel = false;
 		int width;
 		int height;
 		if(cli) {
@@ -41,8 +41,11 @@ public class Main {
 		}
 
 		if(use_sixel && cli && args.length < 2) { // approximate accounting for sixel size
-			width *= 3.35;
+			width *= 3.3;
 			height *= 3;
+		}else if(cli && false && args.length < 2) {
+			width *= 2;
+			height *=2;
 		}
 
 		System.out.println("Width: "+width+", Height: "+height);
@@ -55,6 +58,7 @@ public class Main {
 			if(use_sixel) {
 				r = new SixelRenderer(fb, 1);
 			} else {
+				/*
 				MultiShader c = new MultiShader();
 				c.add(new BoolShader());
 				c.add(new BlockCharShader());
@@ -63,6 +67,8 @@ public class Main {
 				c.add(new ANSIShader());
 
 				r = new CLIRenderer(fb, c);
+				*/
+				r = new HalfBlockRenderer(fb);
 			}
 
 			in = new CLIInput();
@@ -138,10 +144,10 @@ public class Main {
 			}
 			
 			if(running) {
-				// wait for next frame time on 60Hz bounds
+				// wait for next frame time on 30Hz bounds
 				long t_end = System.nanoTime();
 				double t_delta = (t_end - t_start) / 1e6; // in millis
-				long t_wait = (long) Math.max(0, 16.67 - t_delta);
+				long t_wait = (long) Math.max(0, 33.33 - t_delta);
 				TimeUnit.MILLISECONDS.sleep(t_wait);
 			}
 		}
