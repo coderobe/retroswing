@@ -10,4 +10,6 @@ public class Core {
 			// hurr
 		});
 	}};
+	private final Map<Byte, Opcode> cb_opcodes = new HashMap<Byte, Opcode>(){{
+	}};
 }
