@@ -16,8 +16,12 @@ public class Main {
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
 		
-		while(true) {
-			core.tick();
+		try {
+			while(true) {
+				core.tick();
+			}
+		} catch(UnknownOpcodeException e) {
+			System.err.println(e.getMessage());
 		}
 	}
 }
