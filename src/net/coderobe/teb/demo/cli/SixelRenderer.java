@@ -41,7 +41,7 @@ public class SixelRenderer implements Renderer {
 		strb.append("\033[;H"); // ANSI cursor to home position
 		strb.append("\033Pq"); // enter sixel mode
 		for(int y = 0; y < fb.getHeight() * zoom; y++) {
-			strb.append("!" + (y+1) + "$-"); // move to line
+			strb.append("$!" + (y+1) + "-"); // move to line
 			for(int x = 0; x < fb.getWidth(); x++) {
 				strb.append("!" + (6 * zoom));
 				int pixcol = fb.getRGB(x, y / zoom);

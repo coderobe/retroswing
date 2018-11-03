@@ -45,6 +45,8 @@ public class Main {
 			height *= 3;
 		}
 
+		System.out.println("Width: "+width+", Height: "+height);
+		
 		Framebuffer fb = new G2DFramebuffer(width, height);
 		Renderer r;
 		InputHandler in;
