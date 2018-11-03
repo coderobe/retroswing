@@ -17,6 +17,10 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// JP nn
+		put((byte) 0xC3, () -> {
+			mmu.PC = mmu.ram.get(mmu.PC++);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
