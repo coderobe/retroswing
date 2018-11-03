@@ -43,7 +43,7 @@ public class Main {
 		if(use_sixel && cli && args.length < 2) { // approximate accounting for sixel size
 			width *= 3.3;
 			height *= 3;
-		}else if(cli && false && args.length < 2) {
+		}else if(cli && args.length < 2) {
 			width *= 2;
 			height *=2;
 		}
