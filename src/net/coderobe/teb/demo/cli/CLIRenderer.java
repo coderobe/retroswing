@@ -27,7 +27,6 @@ public class CLIRenderer implements Renderer {
 		this(f, System.out);
 	}
 	public void draw() {
-		if(!fb.damaged()) return;
 		if(!init) { // move cursor Y lines downwards once to prevent mangling of previous output
 			for(int y = 0; y < fb.getHeight(); y++) {
 				ps.println();

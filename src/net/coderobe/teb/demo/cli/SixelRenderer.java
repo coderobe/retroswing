@@ -28,7 +28,6 @@ public class SixelRenderer implements Renderer {
 		this(f, System.out);
 	}
 	public void draw() {
-		if(!fb.damaged()) return;
 		if(!init) { // move cursor Y lines downwards once to prevent mangling of previous output
 			for(int y = 0; y < fb.getHeight() / 3; y++) { // one line is about 3 sixels high
 				ps.println();
@@ -41,7 +40,6 @@ public class SixelRenderer implements Renderer {
 		strb.append("\033[;H"); // ANSI cursor to home position
 		strb.append("\033Pq"); // enter sixel mode
 		for(int y = 0; y < fb.getHeight() * zoom; y++) {
-			strb.append("-$"); // move down
 			for(int x = 0; x < fb.getWidth(); x++) {
 				strb.append("!" + (6 * zoom));
 				int pixcol = fb.getRGB(x, y / zoom);
@@ -60,6 +58,7 @@ public class SixelRenderer implements Renderer {
 					strb.append("?");
 				}
 			}
+			strb.append("-$"); // move down
 		}
 		strb.append("\033\\"); // leave sixel mode
 		ps.print(strb);
