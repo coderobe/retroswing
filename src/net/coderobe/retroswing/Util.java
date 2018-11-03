@@ -1,4 +1,4 @@
-package net.coderobe.teb.demo;
+package net.coderobe.retroswing;
 
 import java.awt.Color;
 import java.io.File;

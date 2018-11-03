@@ -1,11 +1,11 @@
-package net.coderobe.teb.demo.cli;
+package net.coderobe.retroswing.cli;
 
 import java.io.PrintStream;
 
-import net.coderobe.teb.demo.cli.shader.BoolShader;
-import net.coderobe.teb.demo.iface.CLIShader;
-import net.coderobe.teb.demo.iface.Framebuffer;
-import net.coderobe.teb.demo.iface.Renderer;
+import net.coderobe.retroswing.cli.shader.BoolShader;
+import net.coderobe.retroswing.iface.CLIShader;
+import net.coderobe.retroswing.iface.Framebuffer;
+import net.coderobe.retroswing.iface.Renderer;
 
 public class CLIRenderer implements Renderer {
 	private Framebuffer fb;

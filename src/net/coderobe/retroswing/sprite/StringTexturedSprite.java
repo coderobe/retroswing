@@ -1,11 +1,11 @@
-package net.coderobe.teb.demo.sprite;
+package net.coderobe.retroswing.sprite;
 
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.coderobe.teb.demo.iface.Sprite;
+import net.coderobe.retroswing.iface.Sprite;
 
 public class StringTexturedSprite implements Sprite {
 	private int width;

@@ -1,8 +1,8 @@
-package net.coderobe.teb.demo.cli.shader;
+package net.coderobe.retroswing.cli.shader;
 
 import java.awt.Color;
 
-import net.coderobe.teb.demo.iface.CLIShader;
+import net.coderobe.retroswing.iface.CLIShader;
 
 public class BoolShader implements CLIShader {
 	private Color c;

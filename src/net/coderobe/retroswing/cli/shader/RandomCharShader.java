@@ -1,8 +1,8 @@
-package net.coderobe.teb.demo.cli.shader;
+package net.coderobe.retroswing.cli.shader;
 
 import java.util.Random;
 
-import net.coderobe.teb.demo.iface.CLIShader;
+import net.coderobe.retroswing.iface.CLIShader;
 
 public class RandomCharShader implements CLIShader {
 	public String color(int x, int y, int rgb, String input) {

@@ -1,4 +1,4 @@
-package net.coderobe.teb.demo;
+package net.coderobe.retroswing.test;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -6,25 +6,27 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
-import net.coderobe.teb.demo.cli.CLICleanupHook;
-import net.coderobe.teb.demo.cli.CLIInput;
-import net.coderobe.teb.demo.cli.CLIRenderer;
-import net.coderobe.teb.demo.cli.HalfBlockRenderer;
-import net.coderobe.teb.demo.cli.SixelRenderer;
-import net.coderobe.teb.demo.cli.shader.ANSIShader;
-import net.coderobe.teb.demo.cli.shader.BlockCharShader;
-import net.coderobe.teb.demo.cli.shader.BoolShader;
-import net.coderobe.teb.demo.cli.shader.MultiShader;
-import net.coderobe.teb.demo.cli.shader.RandomCharShader;
-import net.coderobe.teb.demo.gui.SwingInput;
-import net.coderobe.teb.demo.gui.SwingRenderer;
-import net.coderobe.teb.demo.iface.Framebuffer;
-import net.coderobe.teb.demo.iface.InputHandler;
-import net.coderobe.teb.demo.iface.Renderer;
-import net.coderobe.teb.demo.iface.Sprite;
-import net.coderobe.teb.demo.sprite.Border;
-import net.coderobe.teb.demo.sprite.Rect;
-import net.coderobe.teb.demo.sprite.StringTexturedSprite;
+import net.coderobe.retroswing.G2DFramebuffer;
+import net.coderobe.retroswing.Util;
+import net.coderobe.retroswing.cli.CLICleanupHook;
+import net.coderobe.retroswing.cli.CLIInput;
+import net.coderobe.retroswing.cli.CLIRenderer;
+import net.coderobe.retroswing.cli.HalfBlockRenderer;
+import net.coderobe.retroswing.cli.SixelRenderer;
+import net.coderobe.retroswing.cli.shader.ANSIShader;
+import net.coderobe.retroswing.cli.shader.BlockCharShader;
+import net.coderobe.retroswing.cli.shader.BoolShader;
+import net.coderobe.retroswing.cli.shader.MultiShader;
+import net.coderobe.retroswing.cli.shader.RandomCharShader;
+import net.coderobe.retroswing.gui.SwingInput;
+import net.coderobe.retroswing.gui.SwingRenderer;
+import net.coderobe.retroswing.iface.Framebuffer;
+import net.coderobe.retroswing.iface.InputHandler;
+import net.coderobe.retroswing.iface.Renderer;
+import net.coderobe.retroswing.iface.Sprite;
+import net.coderobe.retroswing.sprite.Border;
+import net.coderobe.retroswing.sprite.Rect;
+import net.coderobe.retroswing.sprite.StringTexturedSprite;
 
 public class Main {
 	public static void main(String[] args) throws InterruptedException {

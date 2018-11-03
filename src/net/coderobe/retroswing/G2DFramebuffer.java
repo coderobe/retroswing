@@ -1,12 +1,12 @@
-package net.coderobe.teb.demo;
+package net.coderobe.retroswing;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 
-import net.coderobe.teb.demo.iface.Framebuffer;
-import net.coderobe.teb.demo.iface.Sprite;
+import net.coderobe.retroswing.iface.Framebuffer;
+import net.coderobe.retroswing.iface.Sprite;
 
 public class G2DFramebuffer implements Framebuffer {
 	private int height;

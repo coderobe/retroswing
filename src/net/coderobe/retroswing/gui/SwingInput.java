@@ -1,11 +1,11 @@
-package net.coderobe.teb.demo.gui;
+package net.coderobe.retroswing.gui;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.JFrame;
 
-import net.coderobe.teb.demo.iface.InputHandler;
+import net.coderobe.retroswing.iface.InputHandler;
 
 public class SwingInput extends KeyAdapter implements InputHandler {
 	private JFrame window;

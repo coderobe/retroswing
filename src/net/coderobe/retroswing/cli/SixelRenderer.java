@@ -1,11 +1,11 @@
-package net.coderobe.teb.demo.cli;
+package net.coderobe.retroswing.cli;
 
 import java.awt.Color;
 import java.io.PrintStream;
 import java.util.HashMap;
 
-import net.coderobe.teb.demo.iface.Framebuffer;
-import net.coderobe.teb.demo.iface.Renderer;
+import net.coderobe.retroswing.iface.Framebuffer;
+import net.coderobe.retroswing.iface.Renderer;
 
 public class SixelRenderer implements Renderer {
 	private Framebuffer fb;

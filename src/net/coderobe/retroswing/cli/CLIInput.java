@@ -1,11 +1,11 @@
-package net.coderobe.teb.demo.cli;
+package net.coderobe.retroswing.cli;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import net.coderobe.teb.demo.iface.InputHandler;
+import net.coderobe.retroswing.iface.InputHandler;
 
 public class CLIInput implements InputHandler {
 	private BufferedReader in;

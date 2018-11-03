@@ -1,6 +1,6 @@
-package net.coderobe.teb.demo.cli;
+package net.coderobe.retroswing.cli;
 
-import net.coderobe.teb.demo.Util;
+import net.coderobe.retroswing.Util;
 
 public class CLICleanupHook extends Thread {
 	public void run() {

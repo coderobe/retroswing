@@ -1,8 +1,8 @@
-package net.coderobe.teb.demo.sprite;
+package net.coderobe.retroswing.sprite;
 
 import java.awt.Color;
 
-import net.coderobe.teb.demo.iface.Sprite;
+import net.coderobe.retroswing.iface.Sprite;
 
 public class Rect implements Sprite {
 	private int width;

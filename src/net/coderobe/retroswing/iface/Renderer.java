@@ -1,4 +1,4 @@
-package net.coderobe.teb.demo.iface;
+package net.coderobe.retroswing.iface;
 
 public interface Renderer {
 	void draw();

@@ -1,4 +1,4 @@
-package net.coderobe.teb.demo.gui;
+package net.coderobe.retroswing.gui;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -7,8 +7,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.coderobe.teb.demo.iface.Framebuffer;
-import net.coderobe.teb.demo.iface.Renderer;
+import net.coderobe.retroswing.iface.Framebuffer;
+import net.coderobe.retroswing.iface.Renderer;
 
 public class SwingRenderer implements Renderer {
 	private Framebuffer fb;
