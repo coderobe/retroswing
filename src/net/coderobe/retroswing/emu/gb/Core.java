@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Core {
-	private final Map<Integer, Opcode> opcodes = new HashMap<Integer, Opcode>(){{
+	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
 		// NOP
-		put(0x00, new Opcode() {
+		put((byte) 0x00, new Opcode() {
 			@Override
 			public void exec() {
 				// hurr
