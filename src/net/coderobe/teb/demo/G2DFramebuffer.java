@@ -35,7 +35,11 @@ public class G2DFramebuffer implements Framebuffer {
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	}
 	public int getRGB(int x, int y) {
-		return buffer.getRGB(x, y);
+		try {
+			return buffer.getRGB(x, y);
+		} catch(ArrayIndexOutOfBoundsException e) {
+			return new Color(0, 0, 0).getRGB();
+		}
 	}
 	public void setRGB(int x, int y, int rgb) {
 		try {
