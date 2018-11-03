@@ -5,11 +5,11 @@ import java.util.Map;
 
 public class Core {
 	public Memory mmu = new Memory();
-	public void tick() {
+	public void tick() throws UnknownOpcodeException {
 		try {
 			opcodes.get(mmu.ram.get(mmu.PC++)).exec();
 		} catch(NullPointerException e) {
-			System.err.println("Unknown opcode: "+String.format("0x%02X", mmu.ram.get(mmu.PC-1)));
+			throw new UnknownOpcodeException("Unknown opcode "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", mmu.PC-1));
 		}
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
