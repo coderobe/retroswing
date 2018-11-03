@@ -50,7 +50,7 @@ public class Memory {
 		}
 	};
 	// memory map
-	public final Map<Short, Byte> mem = new HashMap<Short, Byte>(){
+	public final Map<Short, Byte> ram = new HashMap<Short, Byte>(){
 		@Override
 		public Byte get(Object s_o) {
 			Short s = (Short) s_o;
