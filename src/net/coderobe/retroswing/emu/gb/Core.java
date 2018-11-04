@@ -21,6 +21,12 @@ public class Core {
 		put((byte) 0xC3, () -> {
 			mmu.PC = mmu.ram.get(mmu.PC++);
 		});
+		// RST 38H
+		put((byte) 0xFF, () -> {
+			mmu.ram.put(mmu.SP++, (byte) (mmu.PC >> 8));
+			mmu.ram.put(mmu.SP++, (byte) (mmu.PC & 0xFF));
+			mmu.PC = 0x38;
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
