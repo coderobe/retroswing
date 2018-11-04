@@ -514,7 +514,7 @@ public class Core {
 		// INC A
 		put((byte) 0x3C, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('A')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('A', (byte) res);
@@ -522,7 +522,7 @@ public class Core {
 		// INC B
 		put((byte) 0x04, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('B')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('B', (byte) res);
@@ -530,7 +530,7 @@ public class Core {
 		// INC C
 		put((byte) 0x0C, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('C')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('C', (byte) res);
@@ -538,7 +538,7 @@ public class Core {
 		// INC D
 		put((byte) 0x14, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('D')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('D', (byte) res);
@@ -546,7 +546,7 @@ public class Core {
 		// INC E
 		put((byte) 0x1C, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('E')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('E', (byte) res);
@@ -554,7 +554,7 @@ public class Core {
 		// INC H
 		put((byte) 0x24, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('H')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('H', (byte) res);
@@ -562,7 +562,7 @@ public class Core {
 		// INC L
 		put((byte) 0x2C, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('L')) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('L', (byte) res);
@@ -570,7 +570,7 @@ public class Core {
 		// INC (HL)
 		put((byte) 0x34, () -> {
 			int res = Byte.toUnsignedInt(mmu.ram.get(mmu.reg_16.get("HL"))) + 1;
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.ram.put(mmu.reg_16.get("HL"), (byte) res);
@@ -618,7 +618,7 @@ public class Core {
 		put((byte) 0xB0, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.reg_8.get('B')));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -628,7 +628,7 @@ public class Core {
 		put((byte) 0xB1, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.reg_8.get('C')));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -638,7 +638,7 @@ public class Core {
 		put((byte) 0xB2, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.reg_8.get('D')));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -648,7 +648,7 @@ public class Core {
 		put((byte) 0xB3, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.reg_8.get('E')));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -658,7 +658,7 @@ public class Core {
 		put((byte) 0xB4, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.reg_8.get('H')));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -668,7 +668,7 @@ public class Core {
 		put((byte) 0xB5, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.reg_8.get('L')));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -678,7 +678,7 @@ public class Core {
 		put((byte) 0xB6, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.ram.get(mmu.reg_16.get("HL"))));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
@@ -688,7 +688,7 @@ public class Core {
 		put((byte) 0xF6, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
 					| Byte.toUnsignedInt(mmu.ram.get(mmu.PC++)));
-			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
