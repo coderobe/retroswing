@@ -368,6 +368,92 @@ public class Core {
 		put((byte) 0x36, () -> {
 			mmu.ram.put(mmu.reg_16.get("HL"), mmu.ram.get(mmu.PC++));
 		});
+		// LD A, n (additional)
+		// A, (BC)
+		put((byte) 0x0A, () -> {
+			mmu.reg_8.put('A', mmu.ram.get(mmu.reg_16.get("BC")));
+		});
+		// A, (DE)
+		put((byte) 0x1A, () -> {
+			mmu.reg_8.put('A', mmu.ram.get(mmu.reg_16.get("DE")));
+		});
+		// A, (nn)
+		put((byte) 0xFA, () -> {
+			short lower = mmu.ram.get(mmu.PC++);
+			short upper = mmu.ram.get(mmu.PC++);
+			mmu.reg_8.put('A', mmu.ram.get((short)(upper << 8 + lower)));
+		});
+		// LD n, A
+		// LD B, A
+		put((byte) 0x47, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('A'));
+		});
+		// LD C, A
+		put((byte) 0x4F, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('A'));
+		});
+		// LD D, A
+		put((byte) 0x57, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('A'));
+		});
+		// LD E, A
+		put((byte) 0x5F, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('A'));
+		});
+		// LD H, A
+		put((byte) 0x67, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('A'));
+		});
+		// LD L, A
+		put((byte) 0x6F, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('A'));
+		});
+		// LD (BC), A
+		put((byte) 0x02, () -> {
+			mmu.ram.put(mmu.reg_16.get("BC"), mmu.reg_8.get('A'));
+		});
+		// LD (DE), A
+		put((byte) 0x12, () -> {
+			mmu.ram.put(mmu.reg_16.get("DE"), mmu.reg_8.get('A'));
+		});
+		// LD (HL), A
+		put((byte) 0x77, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('A'));
+		});
+		// LD (nn), A
+		put((byte) 0xEA, () -> {
+			short lower = mmu.ram.get(mmu.PC++);
+			short upper = mmu.ram.get(mmu.PC++);
+			mmu.ram.put((short)(upper << 8 + lower), mmu.reg_8.get('A'));
+		});
+		// LD n, nn (16-bit loads)
+		// LD BC, nn
+		put((byte) 0x01, () -> {
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
+			mmu.reg_16.put("BC", (short)((upper << 8) + lower));
+		});
+		// LD DE, nn
+		put((byte) 0x11, () -> {
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
+			mmu.reg_16.put("DE", (short)((upper << 8) + lower));
+		});
+		// LD SP, nn
+		put((byte) 0x31, () -> {
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
+			mmu.SP = (short)((upper << 8) + lower);
+		});
+		// LDI A, (HL)
+		put((byte) 0x2A, () -> {
+			mmu.reg_8.put('A', mmu.ram.get(mmu.reg_16.get("HL")));
+			mmu.reg_16.put("HL", (short) (mmu.reg_16.get("HL") + 1));
+		});
+		// LD (C), A
+		put((byte) 0xE2, () -> {
+			mmu.ram.put((short)(0xFF00 + mmu.reg_8.get('C')), mmu.reg_8.get('A'));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
