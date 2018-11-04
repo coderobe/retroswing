@@ -51,7 +51,7 @@ public class Core {
 			mmu.ram.put(mmu.SP--, (byte) (mmu.PC & 0xFF));
 			mmu.PC = 0x38;
 		});
-		// ADD HL,n
+		// ADD HL,SP
 		put((byte) 0x39, () -> {
 			short hl = mmu.reg_16.get("HL");
 			int sum = hl + mmu.SP;
