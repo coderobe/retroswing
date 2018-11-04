@@ -36,6 +36,13 @@ public class Core {
 			mmu.set_flag('h', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
 			mmu.set_flag('n', false);
 		});
+		put((byte) 0x0D, () -> {
+			int res = mmu.reg_8.get('C')-1;
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (res & 0xF) == 0);
+			mmu.reg_8.put('C', (byte) res);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
