@@ -64,6 +64,14 @@ public class Core {
 		put((byte) 0x06, () -> {
 			mmu.reg_8.put('B', mmu.ram.get(mmu.PC++));
 		});
+		// LD C, n
+		put((byte) 0x0E, () -> {
+			mmu.reg_8.put('C', mmu.ram.get(mmu.PC++));
+		});
+		// LD D, n
+		put((byte) 0x16, () -> {
+			mmu.reg_8.put('D', mmu.ram.get(mmu.PC++));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
