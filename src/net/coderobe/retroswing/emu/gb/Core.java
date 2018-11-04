@@ -19,8 +19,9 @@ public class Core {
 		});
 		// XOR A,n
 		put((byte) 0xAF, () -> {
-			short r = mmu.ram.get(mmu.PC++);
+			byte r = mmu.ram.get(mmu.PC++);
 			r ^= mmu.reg_8.get('A');
+			mmu.reg_8.put('A', r);
 			mmu.set_flag('Z', r == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
