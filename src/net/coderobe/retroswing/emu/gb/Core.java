@@ -117,7 +117,8 @@ public class Core {
 		});
 		// LDH A,(n)
 		put((byte) 0xF0, () -> {
-			mmu.reg_8.put('A', mmu.ram.get((short)(0xFF00 + mmu.ram.get(mmu.PC++))));
+			short addr = (short) (0xFF00 + mmu.ram.get(mmu.PC++));
+			mmu.reg_8.put('A', mmu.ram.get(addr));
 		});
 		// DI
 		put((byte) 0xF3, () -> {
