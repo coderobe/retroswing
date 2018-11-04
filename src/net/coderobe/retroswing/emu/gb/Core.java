@@ -127,6 +127,16 @@ public class Core {
 		put((byte) 0xFB, () -> {
 			interruptable = true;
 		});
+		// CP #
+		put((byte) 0xFE, () -> {
+			byte a = mmu.reg_8.get('A');
+			byte n = mmu.ram.get(mmu.PC++);
+			byte res = (byte) (a - n);
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (res & 0xF) == 0);
+			mmu.set_flag('C', a < n);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
