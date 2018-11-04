@@ -29,9 +29,9 @@ public class Core {
 		});
 		// JR NZ,n
 		put((byte) 0x20, () -> {
-			byte amount = mmu.ram.get(mmu.PC++);
+			byte amount = mmu.ram.get(mmu.PC++); // signed!
 			if(!mmu.get_flag('Z')) {
-				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + Byte.toUnsignedInt(amount));
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
 		// LDD (HL),A
