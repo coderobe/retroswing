@@ -23,9 +23,20 @@ public class Core {
 		});
 		// RST 38H
 		put((byte) 0xFF, () -> {
+			mmu.ram.put(mmu.SP--, (byte) (mmu.PC >> 8));
+			mmu.ram.put(mmu.SP--, (byte) (mmu.PC & 0xFF));
 			mmu.ram.put(mmu.SP++, (byte) (mmu.PC >> 8));
 			mmu.ram.put(mmu.SP++, (byte) (mmu.PC & 0xFF));
 			mmu.PC = 0x38;
+		});
+		// ADD HL,n
+		put((byte) 0x39, () -> {
+			short hl = mmu.reg_16.get("HL");
+			int sum = hl + mmu.SP;
+			mmu.reg_16.put("HL", (short) sum);
+			mmu.set_flag('c', sum > 0xFFFF); // carry from bit 15
+			mmu.set_flag('h', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
+			mmu.set_flag('n', false);
 		});
 		// long opcode
 		put((byte) 0xCB, () -> {
