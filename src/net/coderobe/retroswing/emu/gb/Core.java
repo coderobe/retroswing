@@ -17,6 +17,13 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// JR NZ,n
+		put((byte) 0x20, () -> {
+			byte amount = mmu.ram.get(mmu.PC++);
+			if(!mmu.get_flag('Z')) {
+				mmu.PC += amount;
+			}
+		});
 		// LDD (HL),A
 		put((byte) 0x32, () -> {
 			short addr = mmu.reg_16.get("HL");
