@@ -17,6 +17,15 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// XOR A,n
+		put((byte) 0xAF, () -> {
+			short r = mmu.ram.get(mmu.PC++);
+			r ^= mmu.reg_8.get('A');
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
 		// JP nn
 		put((byte) 0xC3, () -> {
 			byte lower = mmu.ram.get(mmu.PC++);
