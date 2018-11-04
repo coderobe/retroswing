@@ -72,9 +72,9 @@ public class Memory {
 				return PC;
 			} else {
 				short ret = 0x0000;
-				ret |= reg_8.get(String.valueOf(((String) r).charAt(0)));
+				ret |= reg_8.get(((String) r).charAt(0));
 				ret <<= 8;
-				ret |= reg_8.get(String.valueOf(((String) r).charAt(1)));
+				ret |= reg_8.get(((String) r).charAt(1));
 				return ret;
 			}
 		}
