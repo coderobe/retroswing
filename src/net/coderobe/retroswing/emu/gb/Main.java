@@ -70,6 +70,8 @@ public class Main {
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
 		
+		System.out.println("Starting core ticking");
+		
 		try {
 			while(true) {
 				core.tick();
