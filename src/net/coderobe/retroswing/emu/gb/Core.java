@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Core {
 	public Memory mmu = new Memory();
+	public boolean interruptable = true;
 	public void tick() throws UnknownOpcodeException {
 		try {
 			opcodes.get(mmu.ram.get(mmu.PC++)).exec();
@@ -108,6 +109,10 @@ public class Core {
 		// LD A,#
 		put((byte) 0x3E, () -> {
 			mmu.reg_8.put('A', mmu.ram.get(mmu.PC++));
+		});
+		// DI
+		put((byte) 0xF3, () -> {
+			interruptable = false;
 		});
 		// long opcode
 		put((byte) 0xCB, () -> {
