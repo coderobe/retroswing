@@ -49,9 +49,24 @@ public class Main {
 		core.mmu.ram.put((short) 0xFF4B, (byte) 0x00);
 		core.mmu.ram.put((short) 0xFFFF, (byte) 0x00);
 		
-		// Read cartridge into memory
+		// Read cartridge
+		String cart_name = "";
+		for(int loc = 0x134; loc < 0x13F; loc++) {
+			char cart_d = (char)cartridge[loc];
+			if(cart_d == '\0') break;
+			cart_name += cart_d;
+		}
+		System.out.println("Cartridge name: "+cart_name);
+		String cart_code = "";
+		for(int loc = 0x13F; loc < 0x143; loc++) {
+			char cart_d = (char)cartridge[loc];
+			if(cart_d == '\0') break;
+			cart_code += cart_d;
+		}
+		System.out.println("Cartridge code: "+cart_code);
+		System.out.println("Cartridge type: "+cartridge[0x147]);
 		int mem_cart = 0x0000;
-		for (byte b : cartridge) {
+		for(byte b : cartridge) {
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
 		
