@@ -60,6 +60,10 @@ public class Core {
 			byte upper = mmu.ram.get(mmu.PC++);
 			mmu.reg_16.put("HL", (short)((upper << 8) + lower));
 		});
+		// LD B, n
+		put((byte) 0x06, () -> {
+			mmu.reg_8.put('B', mmu.ram.get(mmu.PC++));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
