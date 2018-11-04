@@ -606,6 +606,94 @@ public class Core {
 		put((byte) 0x3B, () -> {
 			mmu.SP = (short)(Short.toUnsignedInt(mmu.SP) - 1);
 		});
+		// OR n (8-bit ALU)
+		// OR A
+		put((byte) 0xB7, () -> {
+			if (mmu.reg_8.get('A') == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
+		// OR B
+		put((byte) 0xB0, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.reg_8.get('B')));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR C
+		put((byte) 0xB1, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.reg_8.get('C')));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR D
+		put((byte) 0xB2, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.reg_8.get('D')));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR E
+		put((byte) 0xB3, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.reg_8.get('E')));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR H
+		put((byte) 0xB4, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.reg_8.get('H')));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR L
+		put((byte) 0xB5, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.reg_8.get('L')));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR (HL)
+		put((byte) 0xB6, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.ram.get(mmu.reg_16.get("HL"))));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
+		// OR #
+		put((byte) 0xF6, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					| Byte.toUnsignedInt(mmu.ram.get(mmu.PC++)));
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
