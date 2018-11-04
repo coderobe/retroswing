@@ -32,9 +32,9 @@ public class Core {
 			short hl = mmu.reg_16.get("HL");
 			int sum = hl + mmu.SP;
 			mmu.reg_16.put("HL", (short) sum);
-			mmu.set_flag('c', sum > 0xFFFF); // carry from bit 15
-			mmu.set_flag('h', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
-			mmu.set_flag('n', false);
+			mmu.set_flag('C', sum > 0xFFFF); // carry from bit 15
+			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
+			mmu.set_flag('N', false);
 		});
 		put((byte) 0x0D, () -> {
 			int res = mmu.reg_8.get('C')-1;
