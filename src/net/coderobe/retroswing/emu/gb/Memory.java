@@ -4,6 +4,72 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Memory {
+	public final Map<String, Short> reg_io_loc = new HashMap<String, Short>(){{
+		// joy pad
+		put("P1", (short) 0xFF00);
+		// serial binary transfer
+		put("SB", (short) 0xFF01);
+		// serial control
+		put("SC", (short) 0xFF02);
+		// divider
+		put("DIV", (short) 0xFF04);
+		// timer counter
+		put("TIMA", (short) 0xFF05);
+		// timer modulo
+		put("TMA", (short) 0xFF06);
+		// timer control
+		put("TAC", (short) 0xFF07);
+		// interrupt flag
+		put("IF", (short) 0xFF0F);
+		// sound
+		put("NR10", (short) 0xFF10);
+		put("NR11", (short) 0xFF11);
+		put("NR12", (short) 0xFF12);
+		put("NR13", (short) 0xFF13);
+		put("NR14", (short) 0xFF14);
+		put("NR21", (short) 0xFF16);
+		put("NR22", (short) 0xFF17);
+		put("NR23", (short) 0xFF18);
+		put("NR24", (short) 0xFF19);
+		put("NR30", (short) 0xFF1A);
+		put("NR31", (short) 0xFF1B);
+		put("NR32", (short) 0xFF1C);
+		put("NR33", (short) 0xFF1D);
+		put("NR34", (short) 0xFF1E);
+		put("NR41", (short) 0xFF20);
+		put("NR42", (short) 0xFF21);
+		put("NR43", (short) 0xFF22);
+		put("NR44", (short) 0xFF23);
+		put("NR50", (short) 0xFF24);
+		put("NR51", (short) 0xFF25);
+		put("NR52", (short) 0xFF26);
+		// lcd
+		put("LCDC", (short) 0xFF40);
+		put("STAT", (short) 0xFF41);
+		put("SCY", (short) 0xFF42);
+		put("SCX", (short) 0xFF43);
+		put("LY", (short) 0xFF44);
+		put("LYC", (short) 0xFF45);
+		put("DMA", (short) 0xFF46);
+		put("BGP", (short) 0xFF47);
+		put("OBP0", (short) 0xFF48);
+		put("OBP1", (short) 0xFF49);
+		put("WY", (short) 0xFF4A);
+		put("WX", (short) 0xFF4B);
+		// interrupt enable
+		put("IE", (short) 0xFFFF);
+	}};
+	public final Map<String, Byte> reg_io = new HashMap<String, Byte>(){
+		@Override
+		public Byte get(Object s_o) {
+			return ram.get(reg_io_loc.get((String) s_o));
+		}
+		@Override
+		public Byte put(String s, Byte b) {
+			ram.put(reg_io_loc.get(s), b);
+			return b;
+		}
+	};
 	// 8-bit registers
 	public final Map<Character, Byte> reg_8 = new HashMap<Character, Byte>(){{
 		put('A', (byte) 0x00);
