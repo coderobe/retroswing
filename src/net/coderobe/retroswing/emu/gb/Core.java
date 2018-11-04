@@ -426,8 +426,8 @@ public class Core {
 		});
 		// A, (nn)
 		put((byte) 0xFA, () -> {
-			short lower = mmu.ram.get(mmu.PC++);
-			short upper = mmu.ram.get(mmu.PC++);
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
 			mmu.reg_8.put('A', mmu.ram.get((short)(upper << 8 + lower)));
 		});
 		// LD n, A
@@ -469,8 +469,8 @@ public class Core {
 		});
 		// LD (nn), A
 		put((byte) 0xEA, () -> {
-			short lower = mmu.ram.get(mmu.PC++);
-			short upper = mmu.ram.get(mmu.PC++);
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
 			mmu.ram.put((short)(upper << 8 + lower), mmu.reg_8.get('A'));
 		});
 		// LD n, nn (16-bit loads)
