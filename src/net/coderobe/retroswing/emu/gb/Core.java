@@ -19,6 +19,14 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// RRA
+		put((byte) 0x1F, () -> {
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', (Byte.toUnsignedInt(mmu.reg_8.get('A')) & 1) == 1);
+			mmu.reg_8.put('A', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A')) >> 1));
+			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('A')) == 0);
+		});
 		// JR NZ,n
 		put((byte) 0x20, () -> {
 			byte amount = mmu.ram.get(mmu.PC++);
