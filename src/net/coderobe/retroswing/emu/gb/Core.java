@@ -566,6 +566,21 @@ public class Core {
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.ram.put(mmu.reg_16.get("HL"), (byte) res);
 		});
+		// CALL
+		put((byte) 0xCD, () -> {
+			short lower = mmu.ram.get(mmu.PC++);
+			short upper = mmu.ram.get(mmu.PC++);
+			int addr = (upper << 8) + lower;
+			mmu.ram.put(mmu.SP--, (byte) upper);
+			mmu.ram.put(mmu.SP--, (byte) lower);
+			mmu.PC = (short) addr;
+		});
+		// RETURN
+		put((byte) 0xC9, () -> {
+			short lower = mmu.ram.get(++mmu.SP);
+			short upper = mmu.ram.get(++mmu.SP);
+			mmu.PC = (short) ((upper << 8) + lower);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
