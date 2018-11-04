@@ -382,6 +382,49 @@ public class Core {
 			short upper = mmu.ram.get(mmu.PC++);
 			mmu.reg_8.put('A', mmu.ram.get((short)(upper << 8 + lower)));
 		});
+		// LD n, A
+		// LD B, A
+		put((byte) 0x47, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('A'));
+		});
+		// LD C, A
+		put((byte) 0x4F, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('A'));
+		});
+		// LD D, A
+		put((byte) 0x57, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('A'));
+		});
+		// LD E, A
+		put((byte) 0x5F, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('A'));
+		});
+		// LD H, A
+		put((byte) 0x67, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('A'));
+		});
+		// LD L, A
+		put((byte) 0x6F, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('A'));
+		});
+		// LD (BC), A
+		put((byte) 0x02, () -> {
+			mmu.ram.put(mmu.reg_16.get("BC"), mmu.reg_8.get('A'));
+		});
+		// LD (DE), A
+		put((byte) 0x12, () -> {
+			mmu.ram.put(mmu.reg_16.get("DE"), mmu.reg_8.get('A'));
+		});
+		// LD (HL), A
+		put((byte) 0x77, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('A'));
+		});
+		// LD (nn), A
+		put((byte) 0xEA, () -> {
+			short lower = mmu.ram.get(mmu.PC++);
+			short upper = mmu.ram.get(mmu.PC++);
+			mmu.ram.put((short)(upper << 8 + lower), mmu.reg_8.get('A'));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
