@@ -19,7 +19,9 @@ public class Core {
 		});
 		// JP nn
 		put((byte) 0xC3, () -> {
-			mmu.PC = mmu.ram.get(mmu.PC++);
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
+			mmu.PC = (short)((upper << 8) + lower);
 		});
 		// RST 38H
 		put((byte) 0xFF, () -> {
