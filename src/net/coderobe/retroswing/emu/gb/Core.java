@@ -17,6 +17,12 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// LDD (HL),A
+		put((byte) 0x32, () -> {
+			short addr = mmu.reg_16.get("HL");
+			mmu.ram.put(addr, mmu.reg_8.get('A'));
+			mmu.reg_16.put("HL", (short)(addr-1));
+		});
 		// XOR A,A
 		put((byte) 0xAF, () -> {
 			mmu.reg_8.put('A', (byte) 0x00);
