@@ -52,6 +52,14 @@ public class Core {
 			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
 			mmu.set_flag('N', false);
 		});
+		// DEC B
+		put((byte) 0x05, () -> {
+			int res = mmu.reg_8.get('B')-1;
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (res & 0xF) == 0);
+			mmu.reg_8.put('B', (byte) res);
+		});
 		// DEC C
 		put((byte) 0x0D, () -> {
 			int res = mmu.reg_8.get('C')-1;
