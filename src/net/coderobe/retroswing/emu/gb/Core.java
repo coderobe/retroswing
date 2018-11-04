@@ -54,6 +54,12 @@ public class Core {
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.reg_8.put('C', (byte) res);
 		});
+		// LD HL, nn
+		put((byte) 0x21, () -> {
+			byte lower = mmu.ram.get(mmu.PC++);
+			byte upper = mmu.ram.get(mmu.PC++);
+			mmu.reg_16.put("HL", (short)((upper << 8) + lower));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
