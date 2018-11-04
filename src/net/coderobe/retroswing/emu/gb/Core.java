@@ -25,8 +25,6 @@ public class Core {
 		put((byte) 0xFF, () -> {
 			mmu.ram.put(mmu.SP--, (byte) (mmu.PC >> 8));
 			mmu.ram.put(mmu.SP--, (byte) (mmu.PC & 0xFF));
-			mmu.ram.put(mmu.SP++, (byte) (mmu.PC >> 8));
-			mmu.ram.put(mmu.SP++, (byte) (mmu.PC & 0xFF));
 			mmu.PC = 0x38;
 		});
 		// ADD HL,n
