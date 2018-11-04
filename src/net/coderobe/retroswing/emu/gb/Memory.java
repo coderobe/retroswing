@@ -5,19 +5,61 @@ import java.util.Map;
 
 public class Memory {
 	// 8-bit registers
-	public final Map<String, Byte> reg_8 = new HashMap<String, Byte>(){{
-		put("A", (byte) 0x00);
-		put("F", (byte) 0x00);
+	public final Map<Character, Byte> reg_8 = new HashMap<Character, Byte>(){{
+		put('A', (byte) 0x00);
+		put('F', (byte) 0x00);
 
-		put("B", (byte) 0x00);
-		put("C", (byte) 0x00);
+		put('B', (byte) 0x00);
+		put('C', (byte) 0x00);
 
-		put("D", (byte) 0x00);
-		put("E", (byte) 0x00);
+		put('D', (byte) 0x00);
+		put('E', (byte) 0x00);
 
-		put("H", (byte) 0x00);
-		put("L", (byte) 0x00);
+		put('H', (byte) 0x00);
+		put('L', (byte) 0x00);
 	}};
+	public void set_flag(char flag, boolean state) {
+		byte f = reg_8.get('F');
+		byte mask = 1;
+		switch(flag) {
+		case 'Z':
+			mask <<= 1;
+		case 'N':
+			mask <<= 1;
+		case 'H':
+			mask <<= 1;
+		case 'C':
+			mask <<= 1;
+		break;
+		default:
+			return;
+		}
+		mask <<= 3;
+		if(state) {
+			reg_8.put('F', (byte) (f | mask));
+		} else {
+			reg_8.put('F', (byte) (f & ~mask));
+		}
+	}
+	public boolean get_flag(char flag) {
+		byte f = reg_8.get('F');
+		byte mask = 1;
+		switch(flag) {
+		case 'Z':
+			mask <<= 1;
+		case 'N':
+			mask <<= 1;
+		case 'H':
+			mask <<= 1;
+		case 'C':
+			mask <<= 1;
+		break;
+		default:
+			return false;
+		}
+		mask <<= 3;
+		return (f & mask) != 0;
+	}
 	public short SP = (short) 0xFFFE; // Stack Pointer
 	public short PC = 0x100; // Program Counter
 	// 16-bit register access hack
@@ -43,8 +85,8 @@ public class Memory {
 			} else if(r.equals("PC")) {
 				PC = v;
 			} else {
-				reg_8.put(String.valueOf(r.charAt(0)), (byte) (v >> 8));
-				reg_8.put(String.valueOf(r.charAt(1)), (byte) (v & 0xFF));
+				reg_8.put(r.charAt(0), (byte) (v >> 8));
+				reg_8.put(r.charAt(1), (byte) (v & 0xFF));
 			}
 			return v;
 		}
