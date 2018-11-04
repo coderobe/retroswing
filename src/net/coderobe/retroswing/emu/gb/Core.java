@@ -453,6 +453,79 @@ public class Core {
 		put((byte) 0xE2, () -> {
 			mmu.ram.put((short)(0xFF00 + mmu.reg_8.get('C')), mmu.reg_8.get('A'));
 		});
+		// INC n
+		// INC A
+		put((byte) 0x3C, () -> {
+			byte initial = mmu.reg_8.get('A');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('A', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC B
+		put((byte) 0x04, () -> {
+			byte initial = mmu.reg_8.get('B');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('B', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC C
+		put((byte) 0x0C, () -> {
+			byte initial = mmu.reg_8.get('C');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('C', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC D
+		put((byte) 0x14, () -> {
+			byte initial = mmu.reg_8.get('D');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('D', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC E
+		put((byte) 0x1C, () -> {
+			byte initial = mmu.reg_8.get('E');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('E', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC H
+		put((byte) 0x24, () -> {
+			byte initial = mmu.reg_8.get('H');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('H', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC L
+		put((byte) 0x2C, () -> {
+			byte initial = mmu.reg_8.get('L');
+			byte res = (byte)(initial + 1);
+			mmu.reg_8.put('L', res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
+		// INC (HL)
+		put((byte) 0x34, () -> {
+			byte initial = mmu.ram.get(mmu.reg_16.get("HL"));
+			byte res = (byte)(initial + 1);
+			mmu.ram.put(mmu.reg_16.get("HL"), res);
+			if (res == 0) mmu.set_flag('Z', true);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', (res & 0xF) == 0);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
