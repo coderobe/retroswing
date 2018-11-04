@@ -444,6 +444,11 @@ public class Core {
 			byte upper = mmu.ram.get(mmu.PC++);
 			mmu.SP = (short)((upper << 8) + lower);
 		});
+		// LDI A, (HL)
+		put((byte) 0x2A, () -> {
+			mmu.reg_8.put('A', mmu.ram.get(mmu.reg_16.get("HL")));
+			mmu.reg_16.put("HL", (short) (mmu.reg_16.get("HL") + 1));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
