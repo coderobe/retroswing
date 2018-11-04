@@ -589,6 +589,23 @@ public class Core {
 			byte upper = mmu.ram.get(++mmu.SP);
 			mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
 		});
+		// DEC nn (16-bit)
+		// DEC BC
+		put((byte) 0x0B, () -> {
+			mmu.reg_16.put("BC", (short)(Short.toUnsignedInt(mmu.reg_16.get("BC")) - 1));
+		});
+		// DEC DE
+		put((byte) 0x1B, () -> {
+			mmu.reg_16.put("DE", (short)(Short.toUnsignedInt(mmu.reg_16.get("DE")) - 1));
+		});
+		// DEC HL
+		put((byte) 0x2B, () -> {
+			mmu.reg_16.put("HL", (short)(Short.toUnsignedInt(mmu.reg_16.get("HL")) - 1));
+		});
+		// DEC SP
+		put((byte) 0x3B, () -> {
+			mmu.SP = (short)(Short.toUnsignedInt(mmu.SP) - 1);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
