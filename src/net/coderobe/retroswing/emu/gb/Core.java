@@ -8,6 +8,7 @@ public class Core {
 	public boolean interruptable = true;
 	public void tick() throws UnknownOpcodeException {
 		try {
+			mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
 			opcodes.get(mmu.ram.get(mmu.PC++)).exec();
 		} catch(NullPointerException e) {
 			throw new UnknownOpcodeException("Unknown opcode "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
