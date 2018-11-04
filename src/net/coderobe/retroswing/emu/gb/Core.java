@@ -139,6 +139,235 @@ public class Core {
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.set_flag('C', a < n);
 		});
+		// LD r1, r2
+		// LD A ,A
+		put((byte) 0x7F, () -> {
+			// Do nothing, as A is already inside A.
+		});
+		// LD A ,B
+		put((byte) 0x78, () -> {
+			mmu.reg_8.put('A', mmu.reg_8.get('B'));
+		});
+		// LD A, C
+		put((byte) 0x79, () -> {
+			mmu.reg_8.put('A', mmu.reg_8.get('C'));
+		});
+		// LD A, D
+		put((byte) 0x7A, () -> {
+			mmu.reg_8.put('A', mmu.reg_8.get('D'));
+		});
+		// LD A, E
+		put((byte) 0x7B, () -> {
+			mmu.reg_8.put('A', mmu.reg_8.get('E'));
+		});
+		// LD A, H
+		put((byte) 0x7C, () -> {
+			mmu.reg_8.put('A', mmu.reg_8.get('H'));
+		});
+		// LD A, L
+		put((byte) 0x7D, () -> {
+			mmu.reg_8.put('A', mmu.reg_8.get('L'));
+		});
+		// LD A, (HL)
+		put((byte) 0x7E, () -> {
+			mmu.reg_8.put('A', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD B, B
+		put((byte) 0x40, () -> {
+			// Do nothing as B is already in B.
+		});
+		// LD B, C
+		put((byte) 0x41, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('C'));
+		});
+		// LD B, D
+		put((byte) 0x42, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('D'));
+		});
+		// LD B, E
+		put((byte) 0x43, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('E'));
+		});
+		// LD B, H
+		put((byte) 0x44, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('H'));
+		});
+		// LD B, L
+		put((byte) 0x45, () -> {
+			mmu.reg_8.put('B', mmu.reg_8.get('L'));
+		});
+		// LD B, (HL)
+		put((byte) 0x46, () -> {
+			mmu.reg_8.put('B', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD C, B
+		put((byte) 0x48, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('B'));
+		});
+		// LD C, C
+		put((byte) 0x49, () -> {
+			// Do nothing as C is already in C.
+		});
+		// LD C, D
+		put((byte) 0x4A, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('D'));
+		});
+		// LD C, E
+		put((byte) 0x4B, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('E'));
+		});
+		// LD C, H
+		put((byte) 0x4C, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('H'));
+		});
+		// LD C, L
+		put((byte) 0x4D, () -> {
+			mmu.reg_8.put('C', mmu.reg_8.get('L'));
+		});
+		// LD C, (HL)
+		put((byte) 0x4E, () -> {
+			mmu.reg_8.put('C', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD D, B
+		put((byte) 0x50, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('B'));
+		});
+		// LD D, C
+		put((byte) 0x51, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('C'));
+		});
+		// LD D, D
+		put((byte) 0x52, () -> {
+			// Do nothing as D is already in D.
+		});
+		// LD D, E
+		put((byte) 0x53, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('E'));
+		});
+		// LD D, H
+		put((byte) 0x54, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('H'));
+		});
+		// LD D, L
+		put((byte) 0x55, () -> {
+			mmu.reg_8.put('D', mmu.reg_8.get('L'));
+		});
+		// LD D, (HL)
+		put((byte) 0x56, () -> {
+			mmu.reg_8.put('D', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD E, B
+		put((byte) 0x58, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('B'));
+		});
+		// LD E, C
+		put((byte) 0x59, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('C'));
+		});
+		// LD E, H
+		put((byte) 0x5A, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('D'));
+		});
+		// LD E, E
+		put((byte) 0x5B, () -> {
+			// Do nothing as E is already in E.
+		});
+		// LD E, H
+		put((byte) 0x5C, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('H'));
+		});
+		// LD E, L
+		put((byte) 0x5D, () -> {
+			mmu.reg_8.put('E', mmu.reg_8.get('L'));
+		});
+		// LD E, (HL)
+		put((byte) 0x5E, () -> {
+			mmu.reg_8.put('E', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD H, B
+		put((byte) 0x60, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('B'));
+		});
+		// LD H, C
+		put((byte) 0x61, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('C'));
+		});
+		// LD H, D
+		put((byte) 0x62, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('D'));
+		});
+		// LD H, E
+		put((byte) 0x63, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('E'));
+		});
+		// LD H, H
+		put((byte) 0x64, () -> {
+			// Do nothing as H is already in H.
+		});
+		// LD H, L
+		put((byte) 0x65, () -> {
+			mmu.reg_8.put('H', mmu.reg_8.get('L'));
+		});
+		// LD H, (HL)
+		put((byte) 0x66, () -> {
+			mmu.reg_8.put('H', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD L, B
+		put((byte) 0x68, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('B'));
+		});
+		// LD L, C
+		put((byte) 0x69, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('C'));
+		});
+		// LD L, D
+		put((byte) 0x6A, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('D'));
+		});
+		// LD L, E
+		put((byte) 0x6B, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('E'));
+		});
+		// LD L, H
+		put((byte) 0x6C, () -> {
+			mmu.reg_8.put('L', mmu.reg_8.get('H'));
+		});
+		// LD L, L
+		put((byte) 0x6D, () -> {
+			// Do nothing as L is already in L.
+		});
+		// LD L, (HL)
+		put((byte) 0x6E, () -> {
+			mmu.reg_8.put('L', mmu.ram.get(mmu.reg_16.get("HL")));
+		});
+		// LD (HL), B
+		put((byte) 0x70, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('B'));
+		});
+		// LD (HL), C
+		put((byte) 0x71, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('C'));
+		});
+		// LD (HL), D
+		put((byte) 0x72, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('D'));
+		});
+		// LD (HL), E
+		put((byte) 0x73, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('E'));
+		});
+		// LD (HL), H
+		put((byte) 0x74, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('H'));
+		});
+		// LD (HL), L
+		put((byte) 0x75, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.reg_8.get('L'));
+		});
+		// LD (HL), n
+		put((byte) 0x36, () -> {
+			mmu.ram.put(mmu.reg_16.get("HL"), mmu.ram.get(mmu.PC++));
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
