@@ -19,10 +19,8 @@ public class Core {
 		});
 		// XOR A,A
 		put((byte) 0xAF, () -> {
-			byte r = mmu.reg_8.get('A');
-			r ^= r;
-			mmu.reg_8.put('A', r);
-			mmu.set_flag('Z', r == 0);
+			mmu.reg_8.put('A', (byte) 0x00);
+			mmu.set_flag('Z', true);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
