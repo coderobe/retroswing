@@ -110,6 +110,11 @@ public class Core {
 		put((byte) 0x3E, () -> {
 			mmu.reg_8.put('A', mmu.ram.get(mmu.PC++));
 		});
+		// LDH (n),A
+		put((byte) 0xE0, () -> {
+			short addr = (short) (0xFF00 + mmu.ram.get(mmu.PC++));
+			mmu.ram.put(addr, mmu.reg_8.get('A'));
+		});
 		// DI
 		put((byte) 0xF3, () -> {
 			interruptable = false;
