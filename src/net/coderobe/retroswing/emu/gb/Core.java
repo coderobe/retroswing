@@ -36,6 +36,7 @@ public class Core {
 			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
 			mmu.set_flag('N', false);
 		});
+		// DEC C
 		put((byte) 0x0D, () -> {
 			int res = mmu.reg_8.get('C')-1;
 			mmu.set_flag('Z', res == 0);
