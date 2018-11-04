@@ -17,10 +17,10 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
-		// XOR A,n
+		// XOR A,A
 		put((byte) 0xAF, () -> {
-			byte r = mmu.ram.get(mmu.PC++);
-			r ^= mmu.reg_8.get('A');
+			byte r = mmu.reg_8.get('A');
+			r ^= r;
 			mmu.reg_8.put('A', r);
 			mmu.set_flag('Z', r == 0);
 			mmu.set_flag('N', false);
