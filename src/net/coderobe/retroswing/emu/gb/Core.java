@@ -114,6 +114,10 @@ public class Core {
 		put((byte) 0xF3, () -> {
 			interruptable = false;
 		});
+		// EI
+		put((byte) 0xFB, () -> {
+			interruptable = true;
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
