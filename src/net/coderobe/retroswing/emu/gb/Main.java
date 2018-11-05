@@ -70,11 +70,13 @@ public class Main {
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
 		
+		System.out.println("Starting gpu");
+		core.gpu.start();
 		System.out.println("Starting core ticking");
-		
 		try {
 			while(true) {
 				core.tick();
+				core.gpu.render();
 			}
 		} catch(UnknownOpcodeException e) {
 			System.err.println(e.getMessage());
