@@ -578,11 +578,13 @@ public class Core {
 		});
 		// CALL
 		put((byte) 0xCD, () -> {
+			byte lower_call = mmu.ram.get(mmu.PC++);
+			byte upper_call = mmu.ram.get(mmu.PC++);
 			byte lower = mmu.ram.get(mmu.PC++);
 			byte upper = mmu.ram.get(mmu.PC++);
 			mmu.ram.put(mmu.SP--, upper);
 			mmu.ram.put(mmu.SP--, lower);
-			mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
+			mmu.PC = (short) (Byte.toUnsignedInt(lower_call) | (Byte.toUnsignedInt(upper_call) << 8));
 		});
 		// RETURN
 		put((byte) 0xC9, () -> {
