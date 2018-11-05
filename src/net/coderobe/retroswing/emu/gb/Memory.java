@@ -107,6 +107,18 @@ public class Memory {
 			reg_8.put('F', (byte) (f & ~mask));
 		}
 	}
+	public void set_bit(short addr, int bit, boolean state) {
+		byte f = ram.get(addr);
+		byte mask = (byte)(1 << bit);
+		if(state) {
+			ram.put(addr, (byte) (f | mask));
+		} else {
+			ram.put(addr, (byte) (f & ~mask));
+		}
+	}
+	public boolean get_bit(short addr, int bit) {
+		return ((ram.get(addr) >> bit) & 1) == 1;
+	}
 	public boolean get_flag(char flag) {
 		byte f = reg_8.get('F');
 		byte mask = 1;
