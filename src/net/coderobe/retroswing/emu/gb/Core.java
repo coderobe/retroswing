@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Core {
 	public Memory mmu = new Memory();
+	public Video gpu = new Video(mmu);
 	public boolean interruptable = true;
 	public void tick() throws UnknownOpcodeException {
 		try {
