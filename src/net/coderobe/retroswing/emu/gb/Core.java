@@ -109,6 +109,52 @@ public class Core {
 			mmu.ram.put(mmu.SP--, (byte) (Short.toUnsignedInt(mmu.PC) & 0xFF));
 			mmu.PC = 0x38;
 		});
+		// INC BC
+		put((byte) 0x03, () -> {
+			int res = Short.toUnsignedInt(mmu.reg_16.get("BC")) + 1;
+			mmu.reg_16.put("BC", (short) res);
+		});
+		// INC DE
+		put((byte) 0x13, () -> {
+			int res = Short.toUnsignedInt(mmu.reg_16.get("DE")) + 1;
+			mmu.reg_16.put("DE", (short) res);
+		});
+		// INC HL
+		put((byte) 0x23, () -> {
+			int res = Short.toUnsignedInt(mmu.reg_16.get("HL")) + 1;
+			mmu.reg_16.put("HL", (short) res);
+		});
+		// INC SP
+		put((byte) 0x33, () -> {
+			mmu.SP++;
+		});
+		// ADD HL,BC
+		put((byte) 0x09, () -> {
+			short hl = mmu.reg_16.get("HL");
+			int sum = Short.toUnsignedInt(hl) + Short.toUnsignedInt(mmu.reg_16.get("BC"));
+			mmu.reg_16.put("HL", (short) sum);
+			mmu.set_flag('C', sum > 0xFFFF); // carry from bit 15
+			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
+			mmu.set_flag('N', false);
+		});
+		// ADD HL,DE
+		put((byte) 0x19, () -> {
+			short hl = mmu.reg_16.get("HL");
+			int sum = Short.toUnsignedInt(hl) + Short.toUnsignedInt(mmu.reg_16.get("DE"));
+			mmu.reg_16.put("HL", (short) sum);
+			mmu.set_flag('C', sum > 0xFFFF); // carry from bit 15
+			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
+			mmu.set_flag('N', false);
+		});
+		// ADD HL,HL
+		put((byte) 0x29, () -> {
+			short hl = mmu.reg_16.get("HL");
+			int sum = Short.toUnsignedInt(hl) + Short.toUnsignedInt(hl);
+			mmu.reg_16.put("HL", (short) sum);
+			mmu.set_flag('C', sum > 0xFFFF); // carry from bit 15
+			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
+			mmu.set_flag('N', false);
+		});
 		// ADD HL,SP
 		put((byte) 0x39, () -> {
 			short hl = mmu.reg_16.get("HL");
