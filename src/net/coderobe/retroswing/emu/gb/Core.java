@@ -35,6 +35,12 @@ public class Core {
 				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
+		// CPL
+		put((byte) 0x2F, () -> {
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', true);
+			mmu.reg_8.put('A', (byte)~(Byte.toUnsignedInt(mmu.reg_8.get('A'))));
+		});
 		// LDD (HL),A
 		put((byte) 0x32, () -> {
 			short addr = mmu.reg_16.get("HL");
