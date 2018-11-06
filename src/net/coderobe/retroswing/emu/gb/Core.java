@@ -670,6 +670,34 @@ public class Core {
 			mmu.set_flag('H', (res & 0xF) == 0);
 			mmu.ram.put(mmu.reg_16.get("HL"), (byte) res);
 		});
+		// PUSH AF
+		put((byte) 0xF5, () -> {
+			byte upper = mmu.reg_8.get('A');
+			byte lower = mmu.reg_8.get('F');
+			mmu.ram.put(mmu.SP--, upper);
+			mmu.ram.put(mmu.SP--, lower);
+		});
+		// PUSH BC
+		put((byte) 0xC5, () -> {
+			byte upper = mmu.reg_8.get('B');
+			byte lower = mmu.reg_8.get('C');
+			mmu.ram.put(mmu.SP--, upper);
+			mmu.ram.put(mmu.SP--, lower);
+		});
+		// PUSH DE
+		put((byte) 0xD5, () -> {
+			byte upper = mmu.reg_8.get('D');
+			byte lower = mmu.reg_8.get('E');
+			mmu.ram.put(mmu.SP--, upper);
+			mmu.ram.put(mmu.SP--, lower);
+		});
+		// PUSH HL
+		put((byte) 0xE5, () -> {
+			byte upper = mmu.reg_8.get('H');
+			byte lower = mmu.reg_8.get('L');
+			mmu.ram.put(mmu.SP--, upper);
+			mmu.ram.put(mmu.SP--, lower);
+		});
 		// CALL
 		put((byte) 0xCD, () -> {
 			byte lower_call = mmu.ram.get(mmu.PC++);
