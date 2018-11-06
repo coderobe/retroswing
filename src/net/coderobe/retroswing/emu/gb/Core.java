@@ -849,5 +849,15 @@ public class Core {
 		});
 	}};
 	private final Map<Byte, Opcode> cb_opcodes = new HashMap<Byte, Opcode>(){{
+		// SWAP A
+		put((byte) 0x37, () -> {
+			byte r = mmu.reg_8.get('A');
+			r = (byte)((r << 4) | (r >> 4));
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', r);
+		});
 	}};
 }
