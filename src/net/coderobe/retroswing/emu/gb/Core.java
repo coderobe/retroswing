@@ -87,6 +87,22 @@ public class Core {
 			byte upper = mmu.ram.get(mmu.PC++);
 			mmu.PC = (short)(Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
 		});
+		// JP (HL)
+		put((byte) 0xE9, () -> {
+			mmu.PC = mmu.reg_16.get("HL");
+		});
+		// POP HL
+		put((byte) 0xE1, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			mmu.reg_16.put("HL", (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8)));
+		});
+		// RST 28H
+		put((byte) 0xEF, () -> {
+			mmu.ram.put(mmu.SP--, (byte) (Short.toUnsignedInt(mmu.PC) >> 8));
+			mmu.ram.put(mmu.SP--, (byte) (Short.toUnsignedInt(mmu.PC) & 0xFF));
+			mmu.PC = 0x28;
+		});
 		// RST 38H
 		put((byte) 0xFF, () -> {
 			mmu.ram.put(mmu.SP--, (byte) (Short.toUnsignedInt(mmu.PC) >> 8));
