@@ -8,12 +8,12 @@ public class Core {
 	public Video gpu = new Video(mmu);
 	public boolean interruptable = true;
 	public void tick() throws UnknownOpcodeException {
-		try {
-			mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
-			opcodes.get(mmu.ram.get(mmu.PC++)).exec();
-		} catch(NullPointerException e) {
+		mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
+		Opcode op = opcodes.get(mmu.ram.get(mmu.PC++));
+		if(op == null) {
 			throw new UnknownOpcodeException("Unknown opcode "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
 		}
+		op.exec();
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
 		// NOP
@@ -705,7 +705,11 @@ public class Core {
 		});
 		// long opcode
 		put((byte) 0xCB, () -> {
-			cb_opcodes.get(mmu.ram.get(mmu.PC++)).exec();
+			Opcode op = cb_opcodes.get(mmu.ram.get(mmu.PC++));
+			if(op == null) {
+				throw new UnknownOpcodeException("Unknown opcode 0xCB "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
+			}
+			op.exec();
 		});
 	}};
 	private final Map<Byte, Opcode> cb_opcodes = new HashMap<Byte, Opcode>(){{
