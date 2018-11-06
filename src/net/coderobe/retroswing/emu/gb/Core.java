@@ -47,6 +47,12 @@ public class Core {
 			mmu.ram.put(addr, mmu.reg_8.get('A'));
 			mmu.reg_16.put("HL", (short)(Short.toUnsignedInt(addr)-1));
 		});
+		// SCF
+		put((byte) 0x37, () -> {
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', true);
+		});
 		// XOR A,A
 		put((byte) 0xAF, () -> {
 			mmu.reg_8.put('A', (byte) 0x00);
