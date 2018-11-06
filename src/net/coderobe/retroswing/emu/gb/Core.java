@@ -709,6 +709,16 @@ public class Core {
 			mmu.set_flag('C', false);
 			mmu.reg_8.put('A', res);
 		});
+		// AND #
+		put((byte) 0xE6, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					& Byte.toUnsignedInt(mmu.ram.get(mmu.PC++)));
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', true);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
 		// long opcode
 		put((byte) 0xCB, () -> {
 			Opcode op = cb_opcodes.get(mmu.ram.get(mmu.PC++));
