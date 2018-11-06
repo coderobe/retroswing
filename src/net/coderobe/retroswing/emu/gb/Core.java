@@ -53,6 +53,26 @@ public class Core {
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', true);
 		});
+		// ADD A,A
+		put((byte) 0x87, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(a);
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('C', sum > 0xF); // carry from bit 3
+			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('N', false);
+		});
+		// XOR A,C
+		put((byte) 0xA9, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.reg_8.get('C');
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
 		// XOR A,A
 		put((byte) 0xAF, () -> {
 			mmu.reg_8.put('A', (byte) 0x00);
