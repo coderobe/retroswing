@@ -77,21 +77,21 @@ public class Video {
 		}
 	}
 	private boolean get_lcd_on() {
-		return mmu.get_bit(mmu.reg_io.get("LCDC"), 7);
+		return mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 7);
 	}
 	private boolean get_display_on() {
-		return mmu.get_bit(mmu.reg_io.get("LCDC"), 0);
+		return mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 0);
 	}
 	private boolean get_window_on() {
-		return mmu.get_bit(mmu.reg_io.get("LCDC"), 5);
+		return mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 5);
 	}
 	private short get_tile_map_bg() {
-		return (mmu.get_bit(mmu.reg_io.get("LCDC"), 3) ? (short) 0x9C00 : (short) 0x9800);
+		return (mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 3) ? (short) 0x9C00 : (short) 0x9800);
 	}
 	private short get_tile_map_win() {
-		return (mmu.get_bit(mmu.reg_io.get("LCDC"), 6) ? (short) 0x9C00 : (short) 0x9800);
+		return (mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 6) ? (short) 0x9C00 : (short) 0x9800);
 	}
 	private short get_tile_data() {
-		return (mmu.get_bit(mmu.reg_io.get("LCDC"), 4) ? (short) 0x8000 : (short) 0x8800);
+		return (mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 4) ? (short) 0x8000 : (short) 0x8800);
 	}
 }
