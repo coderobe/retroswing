@@ -580,8 +580,8 @@ public class Core {
 		put((byte) 0xCD, () -> {
 			byte lower_call = mmu.ram.get(mmu.PC++);
 			byte upper_call = mmu.ram.get(mmu.PC++);
-			byte lower = mmu.ram.get(mmu.PC++);
-			byte upper = mmu.ram.get(mmu.PC++);
+			byte lower = (byte)mmu.PC;
+			byte upper = (byte)(mmu.PC>>8);
 			mmu.ram.put(mmu.SP--, upper);
 			mmu.ram.put(mmu.SP--, lower);
 			mmu.PC = (short) (Byte.toUnsignedInt(lower_call) | (Byte.toUnsignedInt(upper_call) << 8));
