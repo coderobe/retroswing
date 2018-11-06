@@ -859,5 +859,10 @@ public class Core {
 			mmu.set_flag('C', false);
 			mmu.reg_8.put('A', r);
 		});
+		// RES b,A
+		put((byte) 0x87, () -> {
+			int bit = mmu.ram.get(mmu.PC++);
+			mmu.set_bit('A', bit, false);
+		});
 	}};
 }
