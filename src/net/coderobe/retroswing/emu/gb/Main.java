@@ -67,6 +67,7 @@ public class Main {
 		System.out.println("Cartridge type: "+cartridge[0x147]);
 		int mem_cart = 0x0000;
 		for(byte b : cartridge) {
+			if(mem_cart == 0x8000) break;
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
 		
