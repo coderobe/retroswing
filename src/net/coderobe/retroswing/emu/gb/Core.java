@@ -714,6 +714,18 @@ public class Core {
 			mmu.ram.put(mmu.SP--, upper);
 			mmu.ram.put(mmu.SP--, lower);
 		});
+		// CALL NZ,nn
+		put((byte) 0xC4, () -> {
+			byte lower_call = mmu.ram.get(mmu.PC++);
+			byte upper_call = mmu.ram.get(mmu.PC++);
+			if(!mmu.get_flag('Z')) {
+				byte lower = (byte)mmu.PC;
+				byte upper = (byte)(mmu.PC>>8);
+				mmu.ram.put(mmu.SP--, upper);
+				mmu.ram.put(mmu.SP--, lower);
+				mmu.PC = (short) (Byte.toUnsignedInt(lower_call) | (Byte.toUnsignedInt(upper_call) << 8));
+			}
+		});
 		// CALL
 		put((byte) 0xCD, () -> {
 			byte lower_call = mmu.ram.get(mmu.PC++);
