@@ -35,6 +35,13 @@ public class Core {
 				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
+		// JR C,n
+		put((byte) 0x38, () -> {
+			byte amount = mmu.ram.get(mmu.PC++); // signed!
+			if(mmu.get_flag('C')) {
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			}
+		});
 		// CPL
 		put((byte) 0x2F, () -> {
 			mmu.set_flag('N', true);
