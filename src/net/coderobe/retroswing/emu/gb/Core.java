@@ -69,6 +69,15 @@ public class Core {
 			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
 			mmu.set_flag('N', false);
 		});
+		// ADD A,C
+		put((byte) 0x81, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('C'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('C', sum > 0xF); // carry from bit 3
+			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('N', false);
+		});
 		// XOR A,C
 		put((byte) 0xA9, () -> {
 			byte r1 = mmu.reg_8.get('A');
