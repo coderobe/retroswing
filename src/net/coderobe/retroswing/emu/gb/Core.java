@@ -48,6 +48,12 @@ public class Core {
 			mmu.set_flag('H', true);
 			mmu.reg_8.put('A', (byte)~(Byte.toUnsignedInt(mmu.reg_8.get('A'))));
 		});
+		// LDI (HL),A
+		put((byte) 0x22, () -> {
+			short addr = mmu.reg_16.get("HL");
+			mmu.ram.put(addr, mmu.reg_8.get('A'));
+			mmu.reg_16.put("HL", (short)(Short.toUnsignedInt(addr)+1));
+		});
 		// LDD (HL),A
 		put((byte) 0x32, () -> {
 			short addr = mmu.reg_16.get("HL");
