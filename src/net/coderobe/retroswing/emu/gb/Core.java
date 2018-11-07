@@ -811,7 +811,39 @@ public class Core {
 			mmu.ram.put(mmu.SP--, lower);
 			mmu.PC = (short) (Byte.toUnsignedInt(lower_call) | (Byte.toUnsignedInt(upper_call) << 8));
 		});
-		// RETURN
+		// RET NZ
+		put((byte) 0xC0, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			if(!mmu.get_flag('Z')) {
+				mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
+			}
+		});
+		// RET Z
+		put((byte) 0xC8, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			if(mmu.get_flag('Z')) {
+				mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
+			}
+		});
+		// RET NC
+		put((byte) 0xD0, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			if(!mmu.get_flag('C')) {
+				mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
+			}
+		});
+		// RET C
+		put((byte) 0xD8, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			if(mmu.get_flag('C')) {
+				mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
+			}
+		});
+		// RET
 		put((byte) 0xC9, () -> {
 			byte lower = mmu.ram.get(++mmu.SP);
 			byte upper = mmu.ram.get(++mmu.SP);
