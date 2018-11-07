@@ -964,6 +964,13 @@ public class Core {
 			mmu.set_flag('C', false);
 			mmu.reg_8.put('A', res);
 		});
+		// AND A
+		put((byte) 0xA7, () -> {
+			mmu.set_flag('Z', mmu.reg_8.get('A') == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', true);
+			mmu.set_flag('C', false);
+		});
 		// AND #
 		put((byte) 0xE6, () -> {
 			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
