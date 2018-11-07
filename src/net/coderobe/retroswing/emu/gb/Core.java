@@ -164,6 +164,24 @@ public class Core {
 		put((byte) 0xE9, () -> {
 			mmu.PC = mmu.reg_16.get("HL");
 		});
+		// POP AF
+		put((byte) 0xF1, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			mmu.reg_16.put("AF", (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8)));
+		});
+		// POP BC
+		put((byte) 0xC1, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			mmu.reg_16.put("BC", (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8)));
+		});
+		// POP DE
+		put((byte) 0xD1, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			mmu.reg_16.put("DE", (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8)));
+		});
 		// POP HL
 		put((byte) 0xE1, () -> {
 			byte lower = mmu.ram.get(++mmu.SP);
