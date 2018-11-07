@@ -28,10 +28,29 @@ public class Core {
 			mmu.reg_8.put('A', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A')) >> 1));
 			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('A')) == 0);
 		});
+		// JR
+		put((byte) 0x18, () -> {
+			byte amount = mmu.ram.get(mmu.PC++); // signed!
+			mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+		});
 		// JR NZ,n
 		put((byte) 0x20, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
 			if(!mmu.get_flag('Z')) {
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			}
+		});
+		// JR Z,n
+		put((byte) 0x28, () -> {
+			byte amount = mmu.ram.get(mmu.PC++); // signed!
+			if(mmu.get_flag('Z')) {
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			}
+		});
+		// JR NC,n
+		put((byte) 0x30, () -> {
+			byte amount = mmu.ram.get(mmu.PC++); // signed!
+			if(!mmu.get_flag('C')) {
 				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
