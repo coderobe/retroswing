@@ -3,6 +3,7 @@ package net.coderobe.retroswing.emu.gb;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
@@ -75,9 +76,17 @@ public class Main {
 		core.gpu.start();
 		System.out.println("Starting core ticking");
 		try {
+			long t_start = System.nanoTime();
 			while(true) {
 				core.tick();
-				core.gpu.render();
+
+				// wait for next frame time on 30Hz bounds
+				long t_end = System.nanoTime();
+				double t_delta = (t_end - t_start) / 1e6; // in millis
+				if(t_delta > 33.33) {
+					core.gpu.render();
+					t_start = System.nanoTime();
+				}
 			}
 		} catch(UnknownOpcodeException e) {
 			System.err.println(e.getMessage());
