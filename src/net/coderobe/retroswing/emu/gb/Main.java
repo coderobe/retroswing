@@ -82,14 +82,14 @@ public class Main {
 
 				// wait for next frame time on 30Hz bounds
 				long t_end = System.nanoTime();
-				double t_delta = (t_end - t_start) / 1e6; // in millis
-				if(t_delta > 33.33) {
+				if((t_end - t_start) / 1e6 > 33.33) {
 					core.gpu.render();
-					t_start = System.nanoTime();
+					t_start = t_end;
 				}
 			}
 		} catch(UnknownOpcodeException e) {
 			System.err.println(e.getMessage());
+			core.gpu.stop();
 		}
 	}
 }
