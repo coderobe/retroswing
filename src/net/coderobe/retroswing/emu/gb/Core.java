@@ -455,6 +455,24 @@ public class Core {
 		put((byte) 0xFB, () -> {
 			interruptable = true;
 		});
+		// CP H
+		put((byte) 0xBC, () -> {
+			byte a = mmu.reg_8.get('A');
+			byte res = (byte) (Byte.toUnsignedInt(a) - Byte.toUnsignedInt(mmu.reg_8.get('H')));
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (res & 0xF) == 0);
+			mmu.set_flag('C', false);
+		});
+		// CP A
+		put((byte) 0xBF, () -> {
+			byte a = mmu.reg_8.get('A');
+			byte res = (byte) (Byte.toUnsignedInt(a) - Byte.toUnsignedInt(a));
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (res & 0xF) == 0);
+			mmu.set_flag('C', false);
+		});
 		// CP #
 		put((byte) 0xFE, () -> {
 			byte a = mmu.reg_8.get('A');
