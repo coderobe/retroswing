@@ -1262,5 +1262,9 @@ public class Core {
 		put((byte) 0x87, () -> {
 			mmu.set_bit('A', 0, false);
 		});
+		// SET 1,(HL)
+		put((byte) 0xCE, () -> {
+			mmu.set_bit(mmu.reg_16.get("HL"), 1, true);
+		});
 	}};
 }
