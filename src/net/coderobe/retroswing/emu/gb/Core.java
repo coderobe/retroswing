@@ -1190,6 +1190,16 @@ public class Core {
 			mmu.set_flag('C', false);
 			mmu.reg_8.put('A', res);
 		});
+		// AND (HL)
+		put((byte) 0xA6, () -> {
+			byte res = (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A'))
+					& Byte.toUnsignedInt(mmu.ram.get(mmu.reg_16.get("HL"))));
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', true);
+			mmu.set_flag('C', false);
+			mmu.reg_8.put('A', res);
+		});
 		// AND A
 		put((byte) 0xA7, () -> {
 			mmu.set_flag('Z', mmu.reg_8.get('A') == 0);
