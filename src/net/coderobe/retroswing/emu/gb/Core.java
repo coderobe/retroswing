@@ -433,6 +433,10 @@ public class Core {
 		put((byte) 0x3E, () -> {
 			mmu.reg_8.put('A', mmu.ram.get(mmu.PC++));
 		});
+		// LD A,(C)
+		put((byte) 0xF2, () -> {
+			mmu.reg_8.put('A', mmu.ram.get((short)(0xFF00 + mmu.reg_8.get('C'))));
+		});
 		// LDH (n),A
 		put((byte) 0xE0, () -> {
 			short addr = (short) (0xFF00 + Byte.toUnsignedInt(mmu.ram.get(mmu.PC++)));
