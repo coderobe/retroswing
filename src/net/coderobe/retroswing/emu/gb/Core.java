@@ -20,6 +20,14 @@ public class Core {
 		put((byte) 0x00, () -> {
 			// hurr
 		});
+		// RLA
+		put((byte) 0x17, () -> {
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', mmu.get_bit('C', 7));
+			mmu.reg_8.put('A', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A')) << 1));
+			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('A')) == 0);
+		});
 		// RRA
 		put((byte) 0x1F, () -> {
 			mmu.set_flag('N', false);
@@ -84,6 +92,12 @@ public class Core {
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', true);
+		});
+		// CCF
+		put((byte) 0x3F, () -> {
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', !mmu.get_flag('C'));
 		});
 		// ADD A,A
 		put((byte) 0x87, () -> {
