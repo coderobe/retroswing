@@ -951,6 +951,13 @@ public class Core {
 			byte upper = mmu.ram.get(++mmu.SP);
 			mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
 		});
+		// RETI
+		put((byte) 0xD9, () -> {
+			byte lower = mmu.ram.get(++mmu.SP);
+			byte upper = mmu.ram.get(++mmu.SP);
+			mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
+			// TODO: interrupts
+		});
 		// DEC nn (16-bit)
 		// DEC BC
 		put((byte) 0x0B, () -> {
