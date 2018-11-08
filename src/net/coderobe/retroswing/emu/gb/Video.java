@@ -13,11 +13,11 @@ public class Video {
 	public int height = 256;
 	public Framebuffer fb;
 	public Renderer renderer;
-	public Color[] color = new Color[] {
-			new Color(0, 0, 0),
-			new Color(64, 64, 64),
-			new Color(128, 128, 128),
-			new Color(255, 255, 255)
+	public int[] color = new int[] {
+			new Color(0, 0, 0).getRGB(),
+			new Color(64, 64, 64).getRGB(),
+			new Color(128, 128, 128).getRGB(),
+			new Color(255, 255, 255).getRGB()
 	};
 	public Video(Memory m) {
 		mmu = m;
@@ -31,11 +31,11 @@ public class Video {
 	}
 	public void render() {
 		if(get_lcd_on()) { // lcd is operating
-			System.err.println("Video.render");
+			//System.err.println("Video.render");
 			fb.clear();
 			
 			if(get_display_on()) { // screen is on
-				System.err.println("Video.render: display");
+				//System.err.println("Video.render: display");
 
 				short tile_map_bg = get_tile_map_bg();
 				short tile_data_addr = get_tile_data();
@@ -47,9 +47,9 @@ public class Video {
 							short line_addr = (short)(tile_data_addr + Byte.toUnsignedInt(tile_addr) + y*2);
 							short line2_addr = (short)(tile_data_addr + Byte.toUnsignedInt(tile_addr) + y*2+1);
 							for(int x = 0; x < 8; x++) {
-								boolean upper_bit = mmu.get_bit(line_addr, x);
-								boolean lower_bit = mmu.get_bit(line2_addr, x);
-								Color c;
+								boolean upper_bit = mmu.get_bit(line_addr, 7-x);
+								boolean lower_bit = mmu.get_bit(line2_addr, 7-x);
+								int c;
 								if(upper_bit && lower_bit) {
 									c = color[3];
 								} else if(lower_bit) {
@@ -60,14 +60,14 @@ public class Video {
 									c = color[0];
 								}
 
-								fb.setRGB(tx * 8 + x, ty * 8 + y, c.getRGB());
+								fb.setRGB(tx * 8 + x, ty * 8 + y, c);
 							}
 						}
 					}
 				}
 				
 				if(get_window_on()) { // window should be rendered
-					System.err.println("Video.render: window");
+					//System.err.println("Video.render: window");
 					
 					// TODO
 				}
