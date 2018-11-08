@@ -566,10 +566,12 @@ public class Core {
 		});
 		// DI
 		put((byte) 0xF3, () -> {
+			// TODO: fix interrupts
 			interruptable = false;
 		});
 		// EI
 		put((byte) 0xFB, () -> {
+			// TODO: fix interrupts
 			interruptable = true;
 		});
 		// CP H
