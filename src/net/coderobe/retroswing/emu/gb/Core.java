@@ -128,6 +128,72 @@ public class Core {
 			mmu.set_flag('H', false);
 			mmu.set_flag('C', false);
 		});
+		// XOR A,D
+		put((byte) 0xAA, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.reg_8.get('D');
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
+		// XOR A,E
+		put((byte) 0xAB, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.reg_8.get('E');
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
+		// XOR A,H
+		put((byte) 0xAC, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.reg_8.get('H');
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
+		// XOR A,L
+		put((byte) 0xAD, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.reg_8.get('L');
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
+		// XOR A,(HL)
+		put((byte) 0xAE, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.ram.get(mmu.reg_16.get("HL"));
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
+		// XOR A,*
+		put((byte) 0xEE, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.ram.get(mmu.PC++);
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
+		});
 		// XOR A,A
 		put((byte) 0xAF, () -> {
 			mmu.reg_8.put('A', (byte) 0x00);
