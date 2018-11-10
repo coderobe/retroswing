@@ -72,22 +72,15 @@ public class Main {
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
 		
-		System.out.println("Starting gpu");
-		core.gpu.start();
+		System.out.println("Starting GPU thread");
+		new Thread(new VideoRunnable(core)).start();
+
 		System.out.println("Starting core ticking");
 		try {
-			long t_start = System.nanoTime();
 			while(true) {
 				core.tick();
-
-				// wait for next frame time on 30Hz bounds
-				long t_end = System.nanoTime();
-				if((t_end - t_start) / 1e6 > 33.33) {
-					core.gpu.render();
-					t_start = t_end;
-				}
 			}
-		} catch(UnknownOpcodeException e) {
+		} catch(UnknownOpcodeException | InterruptedException e) {
 			System.err.println(e.getMessage());
 			core.gpu.stop();
 		}
