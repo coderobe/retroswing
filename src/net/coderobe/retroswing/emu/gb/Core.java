@@ -79,7 +79,7 @@ public class Core {
 		if(t_sleep > 0) {
 			sleep(t_cycle - t_delta);
 		} else if(t_sleep < 0) {
-			System.err.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns");
+			System.err.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns (late by "+Math.abs(t_sleep)+"ns)");
 		}
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
