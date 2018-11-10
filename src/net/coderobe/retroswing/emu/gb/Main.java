@@ -80,7 +80,7 @@ public class Main {
 			while(true) {
 				core.tick();
 			}
-		} catch(UnknownOpcodeException | InterruptedException e) {
+		} catch(UnknownOpcodeException e) {
 			System.err.println(e.getMessage());
 			core.gpu.stop();
 		}
