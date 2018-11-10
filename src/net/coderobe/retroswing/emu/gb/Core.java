@@ -35,7 +35,7 @@ public class Core {
 			elapsed = System.nanoTime() - startTime;
 		} while (elapsed < nanos);
 	}
-	public void tick() throws UnknownOpcodeException, InterruptedException {
+	public void tick() throws UnknownOpcodeException {
 		long t_start = System.nanoTime();
 		mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
 		byte code = mmu.ram.get(mmu.PC++);
