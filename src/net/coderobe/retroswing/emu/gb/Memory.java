@@ -1,10 +1,10 @@
 package net.coderobe.retroswing.emu.gb;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class Memory {
-	public final Map<String, Short> reg_io_loc = new HashMap<String, Short>(){{
+	public final Map<String, Short> reg_io_loc = new ConcurrentHashMap<String, Short>(){{
 		// joy pad
 		put("P1", (short) 0xFF00);
 		// serial binary transfer
@@ -59,19 +59,19 @@ public class Memory {
 		// interrupt enable
 		put("IE", (short) 0xFFFF);
 	}};
-	public final Map<String, Byte> reg_io = new HashMap<String, Byte>(){
+	public final Map<String, Byte> reg_io = new ConcurrentHashMap<String, Byte>(){
 		@Override
-		public Byte get(Object s_o) {
+		public synchronized Byte get(Object s_o) {
 			return ram.get(reg_io_loc.get((String) s_o));
 		}
 		@Override
-		public Byte put(String s, Byte b) {
+		public synchronized Byte put(String s, Byte b) {
 			ram.put(reg_io_loc.get(s), b);
 			return b;
 		}
 	};
 	// 8-bit registers
-	public final Map<Character, Byte> reg_8 = new HashMap<Character, Byte>(){{
+	public final Map<Character, Byte> reg_8 = new ConcurrentHashMap<Character, Byte>(){{
 		put('A', (byte) 0x00);
 		put('F', (byte) 0x00);
 
@@ -150,12 +150,12 @@ public class Memory {
 		mask <<= 3;
 		return (f & mask) != 0;
 	}
-	public short SP = (short) 0xFFFE; // Stack Pointer
-	public short PC = 0x100; // Program Counter
+	public volatile short SP = (short) 0xFFFE; // Stack Pointer
+	public volatile short PC = 0x100; // Program Counter
 	// 16-bit register access hack
-	public final Map<String, Short> reg_16 = new HashMap<String, Short>(){
+	public final Map<String, Short> reg_16 = new ConcurrentHashMap<String, Short>(){
 		@Override
-		public Short get(Object r) {
+		public synchronized Short get(Object r) {
 			if(r.equals("SP")) {
 				return SP;
 			} else if(r.equals("PC")) {	
@@ -169,7 +169,7 @@ public class Memory {
 			}
 		}
 		@Override
-		public Short put(String r, Short v) {
+		public synchronized Short put(String r, Short v) {
 			if(r.equals("SP")) {
 				SP = v;
 			} else if(r.equals("PC")) {
@@ -182,9 +182,9 @@ public class Memory {
 		}
 	};
 	// memory map
-	public final Map<Short, Byte> ram = new HashMap<Short, Byte>(){
+	public final Map<Short, Byte> ram = new ConcurrentHashMap<Short, Byte>(){
 		@Override
-		public Byte get(Object s_o) {
+		public synchronized Byte get(Object s_o) {
 			Short s = (Short) s_o;
 			int si = s << 1 >> 1;
 			if(si >= 0xC000 && si <= 0xDE00) {
@@ -196,7 +196,7 @@ public class Memory {
 			}
 		}
 		@Override
-		public Byte put(Short s, Byte b) {
+		public synchronized Byte put(Short s, Byte b) {
 			int si = s << 1 >> 1;
 			if(si >= 0xC000 && si <= 0xDE00) {
 				put((short) (si + 0x1000), b);
