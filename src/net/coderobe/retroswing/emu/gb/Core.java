@@ -27,6 +27,25 @@ public class Core {
 	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//E
 	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 //F
 	};
+	public static final int[] cb_op_cycles = new int[] {
+	/*    0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F */
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//0
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//1
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//2
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//3
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//4
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//5
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//6
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//7
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//8
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//9
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//A
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//B
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//C
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//D
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,//E
+	      0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 //F
+	};
 	private static void sleep(long cycles) {
 		long nanos = (long)(cycle_n * cycles);
 		long elapsed;
@@ -39,19 +58,28 @@ public class Core {
 		long t_start = System.nanoTime();
 		mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
 		byte code = mmu.ram.get(mmu.PC++);
-		Opcode op = opcodes.get(code);
+		Opcode op = null;
+		int[] cycle_lut = op_cycles;
+		boolean cb = false;
+		if(code == (byte) 0xCB) {
+			cb = true;
+			code = mmu.ram.get(mmu.PC++);
+			op = cb_opcodes.get(code);
+		} else {
+			op = opcodes.get(code);
+		}
 		if(op == null) {
 			throw new UnknownOpcodeException("Unknown opcode "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
 		}
 		op.exec();
 		long t_end = System.nanoTime();
 		long t_delta = t_end - t_start;
-		long t_cycle = Math.round(op_cycles[Byte.toUnsignedInt(code)] * cycle_n);
+		long t_cycle = Math.round(cycle_lut[Byte.toUnsignedInt(code)] * cycle_n);
 		long t_sleep = t_cycle - t_delta;
 		if(t_sleep > 0) {
 			sleep(t_cycle - t_delta);
 		} else if(t_sleep < 0) {
-			System.err.println("CPU slowdown in "+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns");
+			System.err.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns");
 		}
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
@@ -1278,15 +1306,6 @@ public class Core {
 			mmu.set_flag('H', (res & 0xF) < (a & 0xF));
 			mmu.set_flag('C', res < 0);
 			mmu.reg_8.put('A', (byte) res);
-		});
-		// long opcode
-		put((byte) 0xCB, () -> {
-			//System.err.println(String.format("op 0xCB 0x%02X", Byte.toUnsignedInt(mmu.ram.get(mmu.PC)))+String.format(" at 0x%04X", Short.toUnsignedInt(mmu.PC)));
-			Opcode op = cb_opcodes.get(mmu.ram.get(mmu.PC++));
-			if(op == null) {
-				throw new UnknownOpcodeException("Unknown opcode 0xCB "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
-			}
-			op.exec();
 		});
 	}};
 	private final Map<Byte, Opcode> cb_opcodes = new HashMap<Byte, Opcode>(){{
