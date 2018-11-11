@@ -1388,5 +1388,19 @@ public class Core {
 		put((byte) 0xCE, () -> {
 			mmu.set_bit(mmu.reg_16.get("HL"), 1, true);
 		});
+		// BIT 7,H
+		put((byte) 0x7C, () -> {
+			mmu.set_flag('Z', !mmu.get_bit('H', 7));
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', true);
+		});
+		// RL C
+		put((byte) 0x11, () -> {
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', mmu.get_bit('C', 7));
+			mmu.reg_8.put('C', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('C')) << 1));
+			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('C')) == 0);
+		});
 	}};
 }
