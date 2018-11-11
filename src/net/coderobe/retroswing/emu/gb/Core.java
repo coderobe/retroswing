@@ -7,6 +7,8 @@ public class Core {
 	public Memory mmu = new Memory();
 	public Video gpu = new Video(mmu);
 	public boolean interruptable = true;
+	public volatile long instructions_ran = 0;
+	public volatile long instructions_late = 0;
 	public static final double cycle_n = 238.7;
 	public static final int[] op_cycles = new int[] {
 	/*    0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A,  B,  C,  D,  E,  F */
@@ -54,6 +56,7 @@ public class Core {
 			elapsed = System.nanoTime() - startTime;
 		} while (elapsed < nanos);
 	}
+	public final Map<Byte, Long> opcode_late = new HashMap<Byte, Long>();
 	public void tick() throws UnknownOpcodeException {
 		long t_start = System.nanoTime();
 		mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
@@ -65,11 +68,12 @@ public class Core {
 			cb = true;
 			code = mmu.ram.get(mmu.PC++);
 			op = cb_opcodes.get(code);
+			cycle_lut = cb_op_cycles;
 		} else {
 			op = opcodes.get(code);
 		}
 		if(op == null) {
-			throw new UnknownOpcodeException("Unknown opcode "+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
+			throw new UnknownOpcodeException("Unknown opcode "+(cb ? "0xCB " : "")+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
 		}
 		op.exec();
 		long t_end = System.nanoTime();
@@ -79,8 +83,13 @@ public class Core {
 		if(t_sleep > 0) {
 			sleep(t_cycle - t_delta);
 		} else if(t_sleep < 0) {
-			System.err.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns (late by "+Math.abs(t_sleep)+"ns)");
+			//System.out.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns (late by "+Math.abs(t_sleep)+"ns)");
+			Long lateness = opcode_late.get(code);
+			if(lateness == null) lateness = 0l;
+			opcode_late.put((byte)code, lateness+1);
+			instructions_late++;
 		}
+		instructions_ran++;
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
 		// NOP
