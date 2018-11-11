@@ -44,8 +44,8 @@ public class Video {
 					for(int tx = 0; tx < 32; tx++) {
 						byte tile_addr = mmu.ram.get((short)(tile_map_bg + tx + ty*32));
 						for(int y = 0; y < 8; y++) {
-							short line_addr = (short)(tile_data_addr | tile_addr + y*2);
-							short line2_addr = (short)(tile_data_addr | tile_addr + y*2+1);
+							short line_addr = (short)(tile_data_addr + Byte.toUnsignedInt(tile_addr)*16 + y*2);
+							short line2_addr = (short)(tile_data_addr + Byte.toUnsignedInt(tile_addr)*16 + y*2 + 1);
 							for(int x = 0; x < 8; x++) {
 								boolean upper_bit = mmu.get_bit(line_addr, 7-x);
 								boolean lower_bit = mmu.get_bit(line2_addr, 7-x);
