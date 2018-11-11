@@ -91,7 +91,7 @@ public class Core {
 		put((byte) 0x17, () -> {
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
-			mmu.set_flag('C', mmu.get_bit('C', 7));
+			mmu.set_flag('C', mmu.get_bit('A', 7));
 			mmu.reg_8.put('A', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A')) << 1));
 			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('A')) == 0);
 		});
@@ -292,14 +292,75 @@ public class Core {
 			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
 			mmu.set_flag('N', false);
 		});
-		// SUB A,A
+		// SUB A
 		put((byte) 0x97, () -> {
 			byte a = mmu.reg_8.get('A');
 			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(a);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // no borrow from bit 4 // TODO: double check
-			mmu.set_flag('H', sum > 0); // no borrow
-			mmu.set_flag('N', false);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
+		});
+		// SUB B
+		put((byte) 0x90, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('B'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
+		});
+		// SUB C
+		put((byte) 0x91, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('C'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
+		});
+		// SUB D
+		put((byte) 0x92, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('D'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
+		});
+		// SUB E
+		put((byte) 0x93, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('E'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
+		});
+		// SUB H
+		put((byte) 0x94, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('H'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
+		});
+		// SUB L
+		put((byte) 0x95, () -> {
+			byte a = mmu.reg_8.get('A');
+			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('L'));
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', sum == 0);
+			mmu.set_flag('C', sum >= 0); // no borrow
+			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('N', true);
 		});
 		// XOR A,C
 		put((byte) 0xA9, () -> {
@@ -1083,7 +1144,7 @@ public class Core {
 			byte upper_call = mmu.ram.get(mmu.PC++);
 			if(!mmu.get_flag('Z')) {
 				byte lower = (byte)mmu.PC;
-				byte upper = (byte)(mmu.PC>>8);
+				byte upper = (byte)(mmu.PC>>>8);
 				mmu.ram.put(mmu.SP--, upper);
 				mmu.ram.put(mmu.SP--, lower);
 				mmu.PC = (short) (Byte.toUnsignedInt(lower_call) | (Byte.toUnsignedInt(upper_call) << 8));
@@ -1094,7 +1155,7 @@ public class Core {
 			byte lower_call = mmu.ram.get(mmu.PC++);
 			byte upper_call = mmu.ram.get(mmu.PC++);
 			byte lower = (byte)mmu.PC;
-			byte upper = (byte)(mmu.PC>>8);
+			byte upper = (byte)(mmu.PC>>>8);
 			mmu.ram.put(mmu.SP--, upper);
 			mmu.ram.put(mmu.SP--, lower);
 			mmu.PC = (short) (Byte.toUnsignedInt(lower_call) | (Byte.toUnsignedInt(upper_call) << 8));
@@ -1312,7 +1373,7 @@ public class Core {
 		// SWAP A
 		put((byte) 0x37, () -> {
 			byte r = mmu.reg_8.get('A');
-			r = (byte)((r << 4) | (r >> 4));
+			r = (byte)((r << 4) | (r >>> 4));
 			mmu.set_flag('Z', r == 0);
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
