@@ -14,10 +14,10 @@ public class Video {
 	public Framebuffer fb;
 	public Renderer renderer;
 	public int[] color = new int[] {
-			new Color(0, 0, 0).getRGB(),
-			new Color(64, 64, 64).getRGB(),
-			new Color(128, 128, 128).getRGB(),
-			new Color(255, 255, 255).getRGB()
+			new Color(12, 16, 26).getRGB(),
+			new Color(44, 104, 79).getRGB(),
+			new Color(137, 194, 112).getRGB(),
+			new Color(205, 228, 189).getRGB()
 	};
 	public Video(Memory m) {
 		mmu = m;
