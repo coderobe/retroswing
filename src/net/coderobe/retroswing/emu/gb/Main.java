@@ -66,14 +66,33 @@ public class Main {
 		}
 		System.out.println("Cartridge code: "+cart_code);
 		System.out.println("Cartridge type: "+cartridge[0x147]);
+		
+		System.out.println("Starting GPU thread");
+		new Thread(new VideoRunnable(core)).start();
+
+		System.out.println("Registering shutdown hooks");
+		class ShutdownRunnable implements Runnable {
+			private Core core;
+			ShutdownRunnable(Core c){
+				core = c;
+			}
+			public void run() {
+				System.out.println("\nStatistics:");
+				System.out.println("Instructions ran:  "+core.instructions_ran);
+				System.out.println("Instructions late: "+core.instructions_late);
+				core.opcode_late.forEach((Byte code, Long amount) -> {
+					System.out.println(String.format("0x%02X", code)+" -> "+amount);
+				});
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownRunnable(core)));
+
+		System.out.println("Inserting target rom");
 		int mem_cart = 0x0000;
 		for(byte b : cartridge) {
 			if(mem_cart == 0x8000) break;
 			core.mmu.ram.put((short) mem_cart++, b);
 		}
-		
-		System.out.println("Starting GPU thread");
-		new Thread(new VideoRunnable(core)).start();
 
 		System.out.println("Starting core ticking");
 		try {
@@ -83,6 +102,7 @@ public class Main {
 		} catch(UnknownOpcodeException e) {
 			System.err.println(e.getMessage());
 			core.gpu.stop();
+			System.exit(1);
 		}
 	}
 }
