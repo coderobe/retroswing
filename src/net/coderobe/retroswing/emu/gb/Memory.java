@@ -1,10 +1,11 @@
 package net.coderobe.retroswing.emu.gb;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Memory {
-	public final Map<String, Short> reg_io_loc = new ConcurrentHashMap<String, Short>(){{
+	public final Map<String, Short> reg_io_loc = new ConcurrentHashMap<String, Short>(64, 1f, 1){{
 		// joy pad
 		put("P1", (short) 0xFF00);
 		// serial binary transfer
@@ -59,19 +60,19 @@ public class Memory {
 		// interrupt enable
 		put("IE", (short) 0xFFFF);
 	}};
-	public final Map<String, Byte> reg_io = new ConcurrentHashMap<String, Byte>(){
+	public final Map<String, Byte> reg_io = new HashMap<String, Byte>(){
 		@Override
-		public synchronized Byte get(Object s_o) {
+		public Byte get(Object s_o) {
 			return ram.get(reg_io_loc.get((String) s_o));
 		}
 		@Override
-		public synchronized Byte put(String s, Byte b) {
+		public Byte put(String s, Byte b) {
 			ram.put(reg_io_loc.get(s), b);
 			return b;
 		}
 	};
 	// 8-bit registers
-	public final Map<Character, Byte> reg_8 = new ConcurrentHashMap<Character, Byte>(){{
+	public final Map<Character, Byte> reg_8 = new ConcurrentHashMap<Character, Byte>(8, 1f, 1){{
 		put('A', (byte) 0x00);
 		put('F', (byte) 0x00);
 
@@ -84,7 +85,7 @@ public class Memory {
 		put('H', (byte) 0x00);
 		put('L', (byte) 0x00);
 	}};
-	public void set_flag(char flag, boolean state) {
+	public synchronized void set_flag(char flag, boolean state) {
 		byte f = reg_8.get('F');
 		byte mask = 1;
 		switch(flag) {
@@ -107,7 +108,7 @@ public class Memory {
 			reg_8.put('F', (byte) (f & ~mask));
 		}
 	}
-	public void set_bit(short addr, int bit, boolean state) {
+	public synchronized void set_bit(short addr, int bit, boolean state) {
 		byte f = ram.get(addr);
 		byte mask = (byte)(1 << bit);
 		if(state) {
@@ -116,7 +117,7 @@ public class Memory {
 			ram.put(addr, (byte) (f & ~mask));
 		}
 	}
-	public void set_bit(char reg, int bit, boolean state) {
+	public synchronized void set_bit(char reg, int bit, boolean state) {
 		byte f = reg_8.get(reg);
 		byte mask = (byte)(1 << bit);
 		if(state) {
@@ -126,10 +127,10 @@ public class Memory {
 		}
 	}
 	public boolean get_bit(short addr, int bit) {
-		return ((ram.get(addr) >> bit) & 1) == 1;
+		return ((ram.get(addr) >>> bit) & 1) == 1;
 	}
 	public boolean get_bit(char reg, int bit) {
-		return ((reg_8.get(reg) >> bit) & 1) == 1;
+		return ((reg_8.get(reg) >>> bit) & 1) == 1;
 	}
 	public boolean get_flag(char flag) {
 		byte f = reg_8.get('F');
@@ -153,7 +154,7 @@ public class Memory {
 	public volatile short SP = (short) 0xFFFE; // Stack Pointer
 	public volatile short PC = 0x100; // Program Counter
 	// 16-bit register access hack
-	public final Map<String, Short> reg_16 = new ConcurrentHashMap<String, Short>(){
+	public final Map<String, Short> reg_16 = new HashMap<String, Short>(){
 		@Override
 		public synchronized Short get(Object r) {
 			if(r.equals("SP")) {
@@ -175,18 +176,18 @@ public class Memory {
 			} else if(r.equals("PC")) {
 				PC = v;
 			} else {
-				reg_8.put(r.charAt(0), (byte) (v >> 8));
+				reg_8.put(r.charAt(0), (byte) (v >>> 8));
 				reg_8.put(r.charAt(1), (byte) (v & 0xFF));
 			}
 			return v;
 		}
 	};
 	// memory map
-	public final Map<Short, Byte> ram = new ConcurrentHashMap<Short, Byte>(){
+	public final Map<Short, Byte> ram = new ConcurrentHashMap<Short, Byte>(0xFFFF, 1f, 1){
 		@Override
-		public synchronized Byte get(Object s_o) {
+		public Byte get(Object s_o) {
 			Short s = (Short) s_o;
-			int si = s << 1 >> 1;
+			int si = s << 1 >>> 1;
 			if(si >= 0xC000 && si <= 0xDE00) {
 				return get((short) (si + 0x1000));
 			} else {
@@ -196,8 +197,8 @@ public class Memory {
 			}
 		}
 		@Override
-		public synchronized Byte put(Short s, Byte b) {
-			int si = s << 1 >> 1;
+		public Byte put(Short s, Byte b) {
+			int si = s << 1 >>> 1;
 			if(si >= 0xC000 && si <= 0xDE00) {
 				put((short) (si + 0x1000), b);
 			} else {
