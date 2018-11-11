@@ -51,13 +51,13 @@ public class Video {
 								boolean lower_bit = mmu.get_bit(line2_addr, 7-x);
 								int c;
 								if(upper_bit && lower_bit) {
-									c = color[3];
-								} else if(lower_bit) {
-									c = color[2];
-								} else if(upper_bit) {
-									c = color[1];
-								} else {
 									c = color[0];
+								} else if(lower_bit) {
+									c = color[1];
+								} else if(upper_bit) {
+									c = color[2];
+								} else {
+									c = color[3];
 								}
 
 								fb.setRGB(tx * 8 + x, ty * 8 + y, c);
