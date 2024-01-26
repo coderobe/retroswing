@@ -45,7 +45,7 @@ public class Video {
 
 			// Iterate through each scanline
 			for (int ly = 0; ly < 144; ly++) {
-				mmu.ram.put((short) 0xFF44, (byte) ly);
+				mmu.ram.put(mmu.reg_io_loc.get("LY"), (byte) ly);
 				if (get_display_on()) {
 					renderScanline(ly);
 				}
@@ -55,7 +55,7 @@ public class Video {
 
 			// Vertical blanking interval
 			for (int ly = 144; ly < 154; ly++) {
-				mmu.ram.put((short) 0xFF44, (byte) ly);
+				mmu.ram.put(mmu.reg_io_loc.get("LY"), (byte) ly);
 			}
 
 			checkAndTriggerLCDStatInterrupt();
@@ -64,17 +64,17 @@ public class Video {
 		}
 
 		// Reset LY register after frame rendering
-		mmu.ram.put((short) 0xFF44, (byte) 0);
+		mmu.ram.put(mmu.reg_io_loc.get("LY"), (byte) 0);
 	}
 
 	private void triggerVBlankInterrupt() {
-		mmu.ram.put((short) 0xFF0F, (byte) (mmu.ram.get((short) 0xFF0F) | 0x01)); // Set V-Blank interrupt flag
+		mmu.ram.put(mmu.reg_io_loc.get("IF"), (byte) (mmu.ram.get(mmu.reg_io_loc.get("IF")) | 0x01)); // Set V-Blank interrupt flag
 	}
 
 	private void checkAndTriggerLCDStatInterrupt() {
-		byte stat = mmu.ram.get((short) 0xFF41);
-		byte ly = mmu.ram.get((short) 0xFF44);
-		byte lyc = mmu.ram.get((short) 0xFF45);
+		byte stat = mmu.ram.get(mmu.reg_io_loc.get("STAT"));
+		byte ly = mmu.ram.get(mmu.reg_io_loc.get("LY"));
+		byte lyc = mmu.ram.get(mmu.reg_io_loc.get("LYC"));
 
 		boolean interruptRequested = false;
 
@@ -99,7 +99,7 @@ public class Video {
 		}
 
 		if (interruptRequested) {
-			mmu.ram.put((short) 0xFF0F, (byte) (mmu.ram.get((short) 0xFF0F) | 0x02)); // Set STAT interrupt flag
+			mmu.ram.put(mmu.reg_io_loc.get("IF"), (byte) (mmu.ram.get(mmu.reg_io_loc.get("IF")) | 0x02)); // Set STAT interrupt flag
 		}
 	}
 
