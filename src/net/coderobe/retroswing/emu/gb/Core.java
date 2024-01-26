@@ -6,6 +6,7 @@ import java.util.Map;
 public class Core {
 	public Memory mmu = new Memory();
 	public Video gpu = new Video(mmu);
+	public InterruptHandler interrupts = new InterruptHandler(mmu);
 	public boolean interruptable = true;
 	public volatile long instructions_ran = 0;
 	public volatile long instructions_late = 0;
@@ -58,17 +59,17 @@ public class Core {
 	}
 	public final Map<Byte, Long> opcode_late = new HashMap<Byte, Long>();
 	public void tick() throws UnknownOpcodeException {
-		//long t_start = System.nanoTime();
-		mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
+		long t_start = System.nanoTime();
+		//mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
 		byte code = mmu.ram.get(mmu.PC++);
 		Opcode op = null;
-		//int[] cycle_lut = op_cycles;
+		int[] cycle_lut = op_cycles;
 		boolean cb = false;
 		if(code == (byte) 0xCB) {
 			cb = true;
 			code = mmu.ram.get(mmu.PC++);
 			op = cb_opcodes.get(code);
-			//cycle_lut = cb_op_cycles;
+			cycle_lut = cb_op_cycles;
 		} else {
 			op = opcodes.get(code);
 		}
@@ -76,7 +77,7 @@ public class Core {
 			throw new UnknownOpcodeException("Unknown opcode "+(cb ? "0xCB " : "")+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
 		}
 		op.exec();
-		/*
+		
 		long t_end = System.nanoTime();
 		long t_delta = t_end - t_start;
 		long t_cycle = Math.round(cycle_lut[Byte.toUnsignedInt(code)] * cycle_n);
@@ -84,15 +85,15 @@ public class Core {
 		if(t_sleep > 0) {
 			sleep(t_cycle - t_delta);
 		} else if(t_sleep < 0) {
-			//System.out.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns (late by "+Math.abs(t_sleep)+"ns)");
+			System.out.println("CPU slowdown in "+(cb ? "0xCB " : "")+String.format("0x%02X", code)+": took "+t_delta+"ns, should've been "+t_cycle+"ns (late by "+Math.abs(t_sleep)+"ns)");
 			Long lateness = opcode_late.get(code);
 			if(lateness == null) lateness = 0l;
 			opcode_late.put((byte)code, lateness+1);
 			instructions_late++;
 		}
 		instructions_ran++;
-		*/
 		
+		interrupts.handle();
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
 		// NOP
@@ -101,19 +102,21 @@ public class Core {
 		});
 		// RLA
 		put((byte) 0x17, () -> {
+			boolean oldBit7 = (mmu.reg_8.get('A') & 0x80) != 0;
+			mmu.reg_8.put('A', (byte)((mmu.reg_8.get('A') << 1) | (mmu.get_flag('C') ? 1 : 0)));
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
-			mmu.set_flag('C', mmu.get_bit('A', 7));
-			mmu.reg_8.put('A', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A')) << 1));
-			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('A')) == 0);
+			mmu.set_flag('C', oldBit7);
+			mmu.set_flag('Z', false); // Zero flag is not affected
 		});
 		// RRA
 		put((byte) 0x1F, () -> {
+			boolean oldBit0 = (mmu.reg_8.get('A') & 0x01) != 0;
+			mmu.reg_8.put('A', (byte)((mmu.reg_8.get('A') >> 1) | (mmu.get_flag('C') ? 0x80 : 0)));
 			mmu.set_flag('N', false);
 			mmu.set_flag('H', false);
-			mmu.set_flag('C', (Byte.toUnsignedInt(mmu.reg_8.get('A')) & 1) == 1);
-			mmu.reg_8.put('A', (byte)(Byte.toUnsignedInt(mmu.reg_8.get('A')) >> 1));
-			mmu.set_flag('Z', Byte.toUnsignedInt(mmu.reg_8.get('A')) == 0);
+			mmu.set_flag('C', oldBit0);
+			mmu.set_flag('Z', false); // Zero flag is not affected
 		});
 		// JR
 		put((byte) 0x18, () -> {
@@ -123,29 +126,29 @@ public class Core {
 		// JR NZ,n
 		put((byte) 0x20, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
-			if(!mmu.get_flag('Z')) {
-				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			if (!mmu.get_flag('Z')) {
+				mmu.PC = (short) (mmu.PC + amount);
 			}
 		});
 		// JR Z,n
 		put((byte) 0x28, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
-			if(mmu.get_flag('Z')) {
-				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			if (mmu.get_flag('Z')) {
+				mmu.PC = (short) (mmu.PC + amount);
 			}
 		});
 		// JR NC,n
 		put((byte) 0x30, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
-			if(!mmu.get_flag('C')) {
-				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			if (!mmu.get_flag('C')) {
+				mmu.PC = (short) (mmu.PC + amount);
 			}
 		});
 		// JR C,n
 		put((byte) 0x38, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
-			if(mmu.get_flag('C')) {
-				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
+			if (mmu.get_flag('C')) {
+				mmu.PC = (short) (mmu.PC + amount);
 			}
 		});
 		// CPL
@@ -180,199 +183,251 @@ public class Core {
 		});
 		// ADD A,A
 		put((byte) 0x87, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(a);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int sum = a + a;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (a & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADD A,B
 		put((byte) 0x80, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('B'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int b = Byte.toUnsignedInt(mmu.reg_8.get('B'));
+			int sum = a + b;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (b & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADD A,C
 		put((byte) 0x81, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('C'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int c = Byte.toUnsignedInt(mmu.reg_8.get('C'));
+			int sum = a + c;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (c & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADD A,D
 		put((byte) 0x82, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('D'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int d = Byte.toUnsignedInt(mmu.reg_8.get('D'));
+			int sum = a + d;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (d & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADD A,E
 		put((byte) 0x83, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('E'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int e = Byte.toUnsignedInt(mmu.reg_8.get('E'));
+			int sum = a + e;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (e & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADD A,H
 		put((byte) 0x84, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('H'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int h = Byte.toUnsignedInt(mmu.reg_8.get('H'));
+			int sum = a + h;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (h & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADD A,L
 		put((byte) 0x85, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('L'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int l = Byte.toUnsignedInt(mmu.reg_8.get('L'));
+			int sum = a + l;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (l & 0xF)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
+		});
+		// ADD A,n
+		put((byte) 0xC6, () -> {
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int n = Byte.toUnsignedInt(mmu.ram.get(mmu.PC++));
+			int sum = a + n;
+			mmu.reg_8.put('A', (byte) sum);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', ((a & 0xF) + (n & 0xF)) > 0xF);
+			mmu.set_flag('C', sum > 0xFF);
 		});
 		// ADC A,A
 		put((byte) 0x8F, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(a) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int sum = a + a + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (a & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADC A,B
 		put((byte) 0x88, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('B')) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int b = Byte.toUnsignedInt(mmu.reg_8.get('B'));
+			int sum = a + b + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('C', sum > 0xFF);
+			mmu.set_flag('H', ((a & 0xF) + (b & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
 		});
 		// ADC A,C
 		put((byte) 0x89, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('C')) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int c = Byte.toUnsignedInt(mmu.reg_8.get('C'));
+			int sum = a + c + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
+			mmu.set_flag('H', ((a & 0xF) + (c & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('C', sum > 0xFF);
 		});
 		// ADC A,D
 		put((byte) 0x8A, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('D')) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int d = Byte.toUnsignedInt(mmu.reg_8.get('D'));
+			int sum = a + d + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
+			mmu.set_flag('H', ((a & 0xF) + (d & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('C', sum > 0xFF);
 		});
 		// ADC A,E
 		put((byte) 0x8B, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('E')) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int e = Byte.toUnsignedInt(mmu.reg_8.get('E'));
+			int sum = a + e + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
+			mmu.set_flag('H', ((a & 0xF) + (e & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('C', sum > 0xFF);
 		});
 		// ADC A,H
 		put((byte) 0x8C, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('H')) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int h = Byte.toUnsignedInt(mmu.reg_8.get('H'));
+			int sum = a + h + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
+			mmu.set_flag('H', ((a & 0xF) + (h & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('C', sum > 0xFF);
 		});
 		// ADC A,L
 		put((byte) 0x8D, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) + Short.toUnsignedInt(mmu.reg_8.get('L')) + (mmu.get_flag('C') ? 1 : 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int l = Byte.toUnsignedInt(mmu.reg_8.get('L'));
+			int sum = a + l + (mmu.get_flag('C') ? 1 : 0);
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('C', sum > 0xF); // carry from bit 3
-			mmu.set_flag('H', (sum & 0xFF) < (a & 0xFF)); // carry from bit 7
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', false);
+			mmu.set_flag('H', ((a & 0xF) + (l & 0xF) + (mmu.get_flag('C') ? 1 : 0)) > 0xF);
+			mmu.set_flag('C', sum > 0xFF);
 		});
 		// SUB A
 		put((byte) 0x97, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(a);
-			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.reg_8.put('A', (byte) 0); // A - A = 0
+			mmu.set_flag('Z', true); // A - A is always 0
 			mmu.set_flag('N', true);
+			mmu.set_flag('H', false); // No half carry
+			mmu.set_flag('C', false); // No carry
 		});
 		// SUB B
 		put((byte) 0x90, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('B'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int b = Byte.toUnsignedInt(mmu.reg_8.get('B'));
+			int sum = a - b;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('C', sum < 0);
+			mmu.set_flag('H', (a & 0xF) < (b & 0xF));
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', true);
 		});
 		// SUB C
 		put((byte) 0x91, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('C'));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int c = Byte.toUnsignedInt(mmu.reg_8.get('C'));
+			int sum = a - c;
 			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			mmu.set_flag('C', sum < 0);
+			mmu.set_flag('H', (a & 0xF) < (c & 0xF));
+			mmu.set_flag('Z', (sum & 0xFF) == 0);
 			mmu.set_flag('N', true);
 		});
 		// SUB D
 		put((byte) 0x92, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('D'));
-			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int d = Byte.toUnsignedInt(mmu.reg_8.get('D'));
+			int res = a - d;
+			mmu.reg_8.put('A', (byte) res);
+			mmu.set_flag('Z', (res & 0xFF) == 0);
 			mmu.set_flag('N', true);
+			mmu.set_flag('H', (a & 0xF) < (d & 0xF));
+			mmu.set_flag('C', res < 0);
 		});
 		// SUB E
 		put((byte) 0x93, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('E'));
-			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int e = Byte.toUnsignedInt(mmu.reg_8.get('E'));
+			int res = a - e;
+			mmu.reg_8.put('A', (byte) res);
+			mmu.set_flag('Z', (res & 0xFF) == 0);
 			mmu.set_flag('N', true);
+			mmu.set_flag('H', (a & 0xF) < (e & 0xF));
+			mmu.set_flag('C', res < 0);
 		});
 		// SUB H
 		put((byte) 0x94, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('H'));
-			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int h = Byte.toUnsignedInt(mmu.reg_8.get('H'));
+			int res = a - h;
+			mmu.reg_8.put('A', (byte) res);
+			mmu.set_flag('Z', (res & 0xFF) == 0);
 			mmu.set_flag('N', true);
+			mmu.set_flag('H', (a & 0xF) < (h & 0xF));
+			mmu.set_flag('C', res < 0);
 		});
 		// SUB L
 		put((byte) 0x95, () -> {
-			byte a = mmu.reg_8.get('A');
-			int sum = Short.toUnsignedInt(a) - Short.toUnsignedInt(mmu.reg_8.get('L'));
-			mmu.reg_8.put('A', (byte) sum);
-			mmu.set_flag('Z', sum == 0);
-			mmu.set_flag('C', sum >= 0); // no borrow
-			mmu.set_flag('H', (sum & 0xF) == 0xF); // no borrow from bit 4
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int l = Byte.toUnsignedInt(mmu.reg_8.get('L'));
+			int res = a - l;
+			mmu.reg_8.put('A', (byte) res);
+			mmu.set_flag('Z', (res & 0xFF) == 0);
 			mmu.set_flag('N', true);
+			mmu.set_flag('H', (a & 0xF) < (l & 0xF));
+			mmu.set_flag('C', res < 0);
+		});
+		// XOR A,B
+		put((byte) 0xA8, () -> {
+			byte r1 = mmu.reg_8.get('A');
+			byte r2 = mmu.reg_8.get('B');
+			byte r = (byte)(r2 ^ r1);
+			mmu.reg_8.put('A', r);
+			mmu.set_flag('Z', r == 0);
+			mmu.set_flag('N', false);
+			mmu.set_flag('H', false);
+			mmu.set_flag('C', false);
 		});
 		// XOR A,C
 		put((byte) 0xA9, () -> {
@@ -592,6 +647,11 @@ public class Core {
 			mmu.set_flag('H', (sum & 0xFFF) < (hl & 0xFFF)); // carry from bit 11
 			mmu.set_flag('N', false);
 		});
+		// LD A, (HL-)
+		put((byte) 0x3A, () -> {
+			mmu.reg_8.put('A', mmu.ram.get(mmu.reg_16.get("HL")));
+			mmu.reg_16.put("HL", (short)(Short.toUnsignedInt(mmu.reg_16.get("HL")) - 1));
+		});
 		// DEC A
 		put((byte) 0x3D, () -> {
 			int res = Byte.toUnsignedInt(mmu.reg_8.get('A')) - 1;
@@ -716,21 +776,42 @@ public class Core {
 		});
 		// CP H
 		put((byte) 0xBC, () -> {
-			byte a = mmu.reg_8.get('A');
-			byte res = (byte) (Byte.toUnsignedInt(a) - Byte.toUnsignedInt(mmu.reg_8.get('H')));
-			mmu.set_flag('Z', res == 0);
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int h = Byte.toUnsignedInt(mmu.reg_8.get('H'));
+			int res = a - h;
+			mmu.set_flag('Z', (res & 0xFF) == 0);
 			mmu.set_flag('N', true);
-			mmu.set_flag('H', (res & 0xF) == 0);
-			mmu.set_flag('C', false);
+			mmu.set_flag('H', (a & 0xF) < (h & 0xF));
+			mmu.set_flag('C', res < 0);
 		});
 		// CP A
 		put((byte) 0xBF, () -> {
-			byte a = mmu.reg_8.get('A');
-			byte res = (byte) (Byte.toUnsignedInt(a) - Byte.toUnsignedInt(a));
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int res = a - a;
 			mmu.set_flag('Z', res == 0);
 			mmu.set_flag('N', true);
-			mmu.set_flag('H', (res & 0xF) == 0);
-			mmu.set_flag('C', false);
+			mmu.set_flag('H', (a & 0xF) < (a & 0xF));
+			mmu.set_flag('C', res < 0);
+		});
+		// CP B
+		put((byte) 0xB8, () -> {
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int b = Byte.toUnsignedInt(mmu.reg_8.get('B'));
+			int res = a - b;
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (a & 0xF) < (b & 0xF));
+			mmu.set_flag('C', res < 0);
+		});
+		// CP C
+		put((byte) 0xB9, () -> {
+			int a = Byte.toUnsignedInt(mmu.reg_8.get('A'));
+			int c = Byte.toUnsignedInt(mmu.reg_8.get('C'));
+			int res = a - c;
+			mmu.set_flag('Z', res == 0);
+			mmu.set_flag('N', true);
+			mmu.set_flag('H', (a & 0xF) < (c & 0xF));
+			mmu.set_flag('C', res < 0);
 		});
 		// CP #
 		put((byte) 0xFE, () -> {

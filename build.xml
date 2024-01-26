@@ -7,6 +7,13 @@
     <property name="dir.workspace" value="${dir.buildfile}/.."/>
     <property name="dir.jarfile" value="${dir.buildfile}/"/>
     <target name="create_run_jar">
+      <javac
+          srcdir="src"
+          destdir="bin"> 
+        <compilerarg 
+           compiler="org.eclipse.jdt.core.JDTCompilerAdapter" 
+           line="-warn:+unused -Xemacs"/>
+      </javac>
         <jar destfile="${dir.jarfile}/Demo.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="net.coderobe.retroswing.emu.gb.Main"/>
