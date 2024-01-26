@@ -58,17 +58,17 @@ public class Core {
 	}
 	public final Map<Byte, Long> opcode_late = new HashMap<Byte, Long>();
 	public void tick() throws UnknownOpcodeException {
-		long t_start = System.nanoTime();
+		//long t_start = System.nanoTime();
 		mmu.ram.put((short) 0xFF44, (byte) (mmu.ram.get((short) 0xFF44)+1)); // scroll LY until we have lcd rendering (TODO)
 		byte code = mmu.ram.get(mmu.PC++);
 		Opcode op = null;
-		int[] cycle_lut = op_cycles;
+		//int[] cycle_lut = op_cycles;
 		boolean cb = false;
 		if(code == (byte) 0xCB) {
 			cb = true;
 			code = mmu.ram.get(mmu.PC++);
 			op = cb_opcodes.get(code);
-			cycle_lut = cb_op_cycles;
+			//cycle_lut = cb_op_cycles;
 		} else {
 			op = opcodes.get(code);
 		}
@@ -76,6 +76,7 @@ public class Core {
 			throw new UnknownOpcodeException("Unknown opcode "+(cb ? "0xCB " : "")+String.format("0x%02X", mmu.ram.get((short)(mmu.PC-1)))+" at address "+String.format("0x%04X", (short)(mmu.PC-1)));
 		}
 		op.exec();
+		/*
 		long t_end = System.nanoTime();
 		long t_delta = t_end - t_start;
 		long t_cycle = Math.round(cycle_lut[Byte.toUnsignedInt(code)] * cycle_n);
@@ -90,6 +91,8 @@ public class Core {
 			instructions_late++;
 		}
 		instructions_ran++;
+		*/
+		
 	}
 	private final Map<Byte, Opcode> opcodes = new HashMap<Byte, Opcode>(){{
 		// NOP
