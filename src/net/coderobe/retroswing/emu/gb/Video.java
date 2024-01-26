@@ -9,67 +9,67 @@ import net.coderobe.retroswing.iface.Framebuffer;
 import net.coderobe.retroswing.iface.Renderer;
 
 public class Video {
-    private static final short TILE_MAP_BG_1 = (short) 0x9C00;
-    private static final short TILE_MAP_BG_2 = (short) 0x9800;
-    private static final short TILE_DATA_1 = (short) 0x8000;
-    private static final short TILE_DATA_2 = (short) 0x8800;
+	private static final short TILE_MAP_BG_1 = (short) 0x9C00;
+	private static final short TILE_MAP_BG_2 = (short) 0x9800;
+	private static final short TILE_DATA_1 = (short) 0x8000;
+	private static final short TILE_DATA_2 = (short) 0x8800;
 
-    public Memory mmu;
-    public int width = 256;
-    public int height = 256;
-    public Framebuffer fb;
-    public Renderer renderer;
-    public int[] color = new int[]{
-        new Color(12, 16, 26).getRGB(),
-        new Color(44, 104, 79).getRGB(),
-        new Color(137, 194, 112).getRGB(),
-        new Color(205, 228, 189).getRGB()
-    };
+	public Memory mmu;
+	public int width = 256;
+	public int height = 256;
+	public Framebuffer fb;
+	public Renderer renderer;
+	public int[] color = new int[]{
+		new Color(12, 16, 26).getRGB(),
+		new Color(44, 104, 79).getRGB(),
+		new Color(137, 194, 112).getRGB(),
+		new Color(205, 228, 189).getRGB()
+	};
 
-    public Video(Memory m) {
-        mmu = m;
-    }
+	public Video(Memory m) {
+		mmu = m;
+	}
 
-    public void start() {
-        fb = new G2DFramebuffer(width, height);
-        renderer = new SwingRenderer(fb, 2);
-    }
+	public void start() {
+		fb = new G2DFramebuffer(width, height);
+		renderer = new SwingRenderer(fb, 2);
+	}
 
-    public void stop() {
-        renderer.close();
-    }
+	public void stop() {
+		renderer.close();
+	}
 
-    public void render() {
-        if (get_lcd_on()) {
-            fb.clear();
+	public void render() {
+		if (get_lcd_on()) {
+			fb.clear();
 
-            // Iterate through each scanline
-            for (int ly = 0; ly < 144; ly++) {
-                mmu.ram.put((short) 0xFF44, (byte) ly);
-                if (get_display_on()) {
-                    renderScanline(ly);
-                }
-            }
+			// Iterate through each scanline
+			for (int ly = 0; ly < 144; ly++) {
+				mmu.ram.put((short) 0xFF44, (byte) ly);
+				if (get_display_on()) {
+					renderScanline(ly);
+				}
+			}
 
 			triggerVBlankInterrupt();
 
-            // Vertical blanking interval
-            for (int ly = 144; ly < 154; ly++) {
-                mmu.ram.put((short) 0xFF44, (byte) ly);
-            }
+			// Vertical blanking interval
+			for (int ly = 144; ly < 154; ly++) {
+				mmu.ram.put((short) 0xFF44, (byte) ly);
+			}
 
 			checkAndTriggerLCDStatInterrupt();
 
-            renderer.draw();
-        }
+			renderer.draw();
+		}
 
-        // Reset LY register after frame rendering
-        mmu.ram.put((short) 0xFF44, (byte) 0);
-    }
+		// Reset LY register after frame rendering
+		mmu.ram.put((short) 0xFF44, (byte) 0);
+	}
 
-    private void triggerVBlankInterrupt() {
-        mmu.ram.put((short) 0xFF0F, (byte) (mmu.ram.get((short) 0xFF0F) | 0x01)); // Set V-Blank interrupt flag
-    }
+	private void triggerVBlankInterrupt() {
+		mmu.ram.put((short) 0xFF0F, (byte) (mmu.ram.get((short) 0xFF0F) | 0x01)); // Set V-Blank interrupt flag
+	}
 
 	private void checkAndTriggerLCDStatInterrupt() {
 		byte stat = mmu.ram.get((short) 0xFF41);
@@ -103,25 +103,24 @@ public class Video {
 		}
 	}
 
-    private void renderScanline(int ly) {
-        if (get_window_on()) {
-            // TODO: Render window for the current scanline
-        }
-        // Render background for the current scanline
-        renderBackground(ly);
-    }
+	private void renderScanline(int ly) {
+		if (get_window_on()) {
+			// TODO: Render window for the current scanline
+		}
+		// Render background for the current scanline
+		renderBackground(ly);
+	}
 
-    private void renderBackground(int ly) {
-        // Modify this method to render based on the current LY value
-        short tile_map_bg = get_tile_map_bg();
-        short tile_data_addr = get_tile_data();
+	private void renderBackground(int ly) {
+		short tile_map_bg = get_tile_map_bg();
+		short tile_data_addr = get_tile_data();
 
-        for (int ty = 0; ty < 32; ty++) {
-            for (int tx = 0; tx < 32; tx++) {
-                renderTile(tile_map_bg, tile_data_addr, tx, ty);
-            }
-        }
-    }
+		for (int ty = 0; ty < 32; ty++) {
+			for (int tx = 0; tx < 32; tx++) {
+				renderTile(tile_map_bg, tile_data_addr, tx, ty);
+			}
+		}
+	}
 
 	private void renderTile(short tileMapBg, short tileDataAddr, int tx, int ty) {
 		byte tileAddr = mmu.ram.get((short) (tileMapBg + tx + ty * 32));

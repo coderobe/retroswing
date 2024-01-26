@@ -66,7 +66,7 @@ public class Memory {
 		reg_8.put('L', (byte) 0x00);
 	}
 
-	public synchronized void set_flag(char flag, boolean state) {
+	public void set_flag(char flag, boolean state) {
 		byte f = reg_8.get('F');
 		byte mask = (byte)(1 << (flag - 'A'));
 		if (state) {
@@ -76,13 +76,13 @@ public class Memory {
 		}
 	}
 
-	public synchronized void set_bit(short addr, int bit, boolean state) {
+	public void set_bit(short addr, int bit, boolean state) {
 		byte f = ram.get(addr);
 		byte mask = (byte)(1 << bit);
 		ram.put(addr, state ? (byte) (f | mask) : (byte) (f & ~mask));
 	}
 
-	public synchronized void set_bit(char reg, int bit, boolean state) {
+	public void set_bit(char reg, int bit, boolean state) {
 		byte f = reg_8.get(reg);
 		byte mask = (byte)(1 << bit);
 		reg_8.put(reg, state ? (byte) (f | mask) : (byte) (f & ~mask));
