@@ -40,7 +40,7 @@ public class Video {
 	}
 
 	public void render() {
-		if (get_lcd_on()) {
+		if (true || get_lcd_on()) {
 			fb.clear();
 
 			// Iterate through each scanline
