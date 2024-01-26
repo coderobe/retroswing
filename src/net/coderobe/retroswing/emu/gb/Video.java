@@ -3,6 +3,8 @@ package net.coderobe.retroswing.emu.gb;
 import java.awt.Color;
 
 import net.coderobe.retroswing.G2DFramebuffer;
+import net.coderobe.retroswing.cli.HalfBlockRenderer;
+import net.coderobe.retroswing.cli.SixelRenderer;
 import net.coderobe.retroswing.gui.SwingRenderer;
 import net.coderobe.retroswing.iface.Framebuffer;
 import net.coderobe.retroswing.iface.Renderer;
@@ -25,6 +27,9 @@ public class Video {
 	public void start() {
 		fb = new G2DFramebuffer(width, height);
 		renderer = new SwingRenderer(fb, 2);
+		//renderer = new HalfBlockRenderer(fb);
+		//renderer = new SixelRenderer(fb);
+
 	}
 	public void stop() {
 		renderer.close();
@@ -34,7 +39,7 @@ public class Video {
 			//System.err.println("Video.render");
 			fb.clear();
 			
-			if(get_display_on()) { // screen is on
+			if(true || get_display_on()) { // screen is on
 				//System.err.println("Video.render: display");
 
 				short tile_map_bg = get_tile_map_bg();
@@ -92,6 +97,6 @@ public class Video {
 		return (mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 6) ? (short) 0x9C00 : (short) 0x9800);
 	}
 	private short get_tile_data() {
-		return (mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 4) ? (short) 0x8000 : (short) 0x8800);
+		return (!mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 4) ? (short) 0x8000 : (short) 0x8800);
 	}
 }
