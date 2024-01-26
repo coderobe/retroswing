@@ -7,7 +7,6 @@ public class Core {
 	public Memory mmu = new Memory();
 	public Video gpu = new Video(mmu);
 	public InterruptHandler interrupts = new InterruptHandler(mmu);
-	public boolean interruptable = true;
 	public volatile long instructions_ran = 0;
 	public volatile long instructions_late = 0;
 	public static final double cycle_n = 238.7;
@@ -127,28 +126,28 @@ public class Core {
 		put((byte) 0x20, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
 			if (!mmu.get_flag('Z')) {
-				mmu.PC = (short) (mmu.PC + amount);
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
 		// JR Z,n
 		put((byte) 0x28, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
 			if (mmu.get_flag('Z')) {
-				mmu.PC = (short) (mmu.PC + amount);
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
 		// JR NC,n
 		put((byte) 0x30, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
 			if (!mmu.get_flag('C')) {
-				mmu.PC = (short) (mmu.PC + amount);
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
 		// JR C,n
 		put((byte) 0x38, () -> {
 			byte amount = mmu.ram.get(mmu.PC++); // signed!
 			if (mmu.get_flag('C')) {
-				mmu.PC = (short) (mmu.PC + amount);
+				mmu.PC = (short) (Short.toUnsignedInt(mmu.PC) + amount);
 			}
 		});
 		// CPL
@@ -766,13 +765,11 @@ public class Core {
 		});
 		// DI
 		put((byte) 0xF3, () -> {
-			// TODO: fix interrupts
-			interruptable = false;
+			interrupts.enabled = false;
 		});
 		// EI
 		put((byte) 0xFB, () -> {
-			// TODO: fix interrupts
-			interruptable = true;
+			interrupts.enabled = true;
 		});
 		// CP H
 		put((byte) 0xBC, () -> {
@@ -1296,7 +1293,7 @@ public class Core {
 			byte lower = mmu.ram.get(++mmu.SP);
 			byte upper = mmu.ram.get(++mmu.SP);
 			mmu.PC = (short) (Byte.toUnsignedInt(lower) | (Byte.toUnsignedInt(upper) << 8));
-			// TODO: interrupts
+			interrupts.enabled = true;
 		});
 		// DEC nn (16-bit)
 		// DEC BC
