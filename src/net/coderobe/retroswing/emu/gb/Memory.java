@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Memory {
 	public final Map<String, Short> reg_io_loc = new ConcurrentHashMap<>(64, 1f, 1);
-	public final Map<Character, Byte> reg_8 = new ConcurrentHashMap<>(8, 1f, 1);
+	public final Map<Character, Byte> reg_8 = new HashMap<>();
 	public final Map<String, Byte> reg_io = new ConcurrentHashMap<>();
 
 	public Memory() {
@@ -68,8 +68,22 @@ public class Memory {
 
 	public void set_flag(char flag, boolean state) {
 		byte f = reg_8.get('F');
-		byte mask = (byte)(1 << (flag - 'A'));
-		if (state) {
+		byte mask = 1;
+		switch(flag) {
+		case 'Z':
+			mask <<= 1;
+		case 'N':
+			mask <<= 1;
+		case 'H':
+			mask <<= 1;
+		case 'C':
+			mask <<= 1;
+		break;
+		default:
+			return;
+		}
+		mask <<= 3;
+		if(state) {
 			reg_8.put('F', (byte) (f | mask));
 		} else {
 			reg_8.put('F', (byte) (f & ~mask));
@@ -98,7 +112,21 @@ public class Memory {
 
 	public boolean get_flag(char flag) {
 		byte f = reg_8.get('F');
-		byte mask = (byte)(1 << (flag - 'A'));
+		byte mask = 1;
+		switch(flag) {
+		case 'Z':
+			mask <<= 1;
+		case 'N':
+			mask <<= 1;
+		case 'H':
+			mask <<= 1;
+		case 'C':
+			mask <<= 1;
+		break;
+		default:
+			return false;
+		}
+		mask <<= 3;
 		return (f & mask) != 0;
 	}
 
