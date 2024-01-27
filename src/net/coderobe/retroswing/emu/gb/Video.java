@@ -9,11 +9,6 @@ import net.coderobe.retroswing.iface.Framebuffer;
 import net.coderobe.retroswing.iface.Renderer;
 
 public class Video {
-	private static final short TILE_MAP_BG_1 = (short) 0x9C00;
-	private static final short TILE_MAP_BG_2 = (short) 0x9800;
-	private static final short TILE_DATA_1 = (short) 0x8000;
-	private static final short TILE_DATA_2 = (short) 0x8800;
-
 	public Memory mmu;
 	public int width = 256;
 	public int height = 256;
@@ -40,13 +35,14 @@ public class Video {
 	}
 
 	public void render() {
-		if (true || get_lcd_on()) {
-			fb.clear();
+		long render_start = System.nanoTime();
+		if (get_lcd_on()) {
+			//fb.clear(); // TODO: clean up or maake fast
 
 			// Iterate through each scanline
 			for (int ly = 0; ly < 144; ly++) {
 				mmu.ram.put(mmu.reg_io_loc.get("LY"), (byte) ly);
-				if (get_display_on()) {
+				if (true /* <- TODO: remove me without breaking it */ || get_display_on()) {
 					renderScanline(ly);
 				}
 			}
@@ -54,6 +50,12 @@ public class Video {
 			triggerVBlankInterrupt();
 
 			// Vertical blanking interval
+			try { // wait for vblank on 60Hz bounds
+				Thread.sleep(Math.max(0, (long) (16.7 - ((System.nanoTime() - render_start) / 1e6))));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			for (int ly = 144; ly < 154; ly++) {
 				mmu.ram.put(mmu.reg_io_loc.get("LY"), (byte) ly);
 			}
@@ -165,10 +167,10 @@ public class Video {
 	}
 
 	private short get_tile_map_bg() {
-		return mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 3) ? TILE_MAP_BG_1 : TILE_MAP_BG_2;
+		return (mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 6) ? (short) 0x9C00 : (short) 0x9800);
 	}
 
 	private short get_tile_data() {
-		return mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 4) ? TILE_DATA_2 : TILE_DATA_1;
+		return (!mmu.get_bit(mmu.reg_io_loc.get("LCDC"), 4) ? (short) 0x8000 : (short) 0x8800);
 	}
 }
